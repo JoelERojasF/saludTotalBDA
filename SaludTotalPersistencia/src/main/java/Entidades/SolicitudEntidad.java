@@ -29,6 +29,9 @@ public class SolicitudEntidad implements Serializable {
     @Column(name = "id")
     private Integer id;
     
+    @Column(name = "folio", nullable = false)
+    private String folio;
+    
     @Column(name = "fechaHoraGeneracion", nullable = false)
     private Timestamp fechaHoraGeneracion;
     
@@ -42,6 +45,10 @@ public class SolicitudEntidad implements Serializable {
     @ManyToOne()
     @JoinColumn(name = "idDoctor", nullable = false)
     private DoctorEntidad doctor;
+    
+    @ManyToOne()
+    @JoinColumn(name = "idEstudio", nullable = false)
+    private EstudioEntidad estudio;
     
     @OneToMany(mappedBy = "solicitud")
     private List<ResultadoEntidad> resultados;
@@ -79,6 +86,14 @@ public class SolicitudEntidad implements Serializable {
         this.cancelada = cancelada;
     }
 
+    public String getFolio() {
+        return folio;
+    }
+
+    public void setFolio(String folio) {
+        this.folio = folio;
+    }
+
     public ClienteEntidad getCliente() {
         return cliente;
     }
@@ -101,6 +116,14 @@ public class SolicitudEntidad implements Serializable {
 
     public void setResultados(List<ResultadoEntidad> resultados) {
         this.resultados = resultados;
+    }
+
+    public EstudioEntidad getEstudio() {
+        return estudio;
+    }
+
+    public void setEstudio(EstudioEntidad estudio) {
+        this.estudio = estudio;
     }
 
     @Override

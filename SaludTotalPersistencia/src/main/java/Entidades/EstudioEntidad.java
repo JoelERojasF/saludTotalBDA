@@ -40,6 +40,9 @@ public class EstudioEntidad implements Serializable {
     
     @OneToMany(mappedBy = "estudio")
     private List<ParametroEntidad> parametros;
+    
+    @OneToMany(mappedBy = "estudio")
+    private List<SolicitudEntidad> solicitudes;
 
     public EstudioEntidad() {
     }
@@ -87,6 +90,14 @@ public class EstudioEntidad implements Serializable {
 
     public void setParametros(List<ParametroEntidad> parametros) {
         this.parametros = parametros;
+    }
+
+    public List<SolicitudEntidad> getSolicitudes() {
+        return solicitudes;
+    }
+
+    public void setSolicitudes(List<SolicitudEntidad> solicitudes) {
+        this.solicitudes = solicitudes;
     }
 
     @Override
