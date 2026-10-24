@@ -30,16 +30,16 @@ public class EmpresaEntidad implements Serializable {
     @Column(name = "direccion", nullable = true)
     private String direcion;
     
-    @Column(name = "direccion", nullable = true)
+    @Column(name = "correo", nullable = true)
     private String correo;
     
-    @Column(name = "direccion", nullable = true)
+    @Column(name = "telefono", nullable = true)
     private String telefono;
     
-    @Column(name = "direccion", nullable = true)
+    @Column(name = "rfc", nullable = true)
     private String rfc;
     
-    @Column(name = "direccion", nullable = true)
+    @Column(name = "cedula", nullable = true)
     private String cedula;
 
     public EmpresaEntidad() {

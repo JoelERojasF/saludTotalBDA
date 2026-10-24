@@ -22,7 +22,7 @@ public class SaludTotalPersistencia {
         IConexionBD conexion = new ConexionBD();
         EntityManager em = conexion.crearConexion();
         em.getTransaction().begin();
-        UsuarioEntidad usuario = new UsuarioEntidad("luis", "123");
+        UsuarioEntidad usuario = new UsuarioEntidad("admin", "123");
         em.persist(usuario);
         em.getTransaction().commit();
     }

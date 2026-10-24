@@ -1,2 +1,2 @@
 CREATE DATABASE IF NOT EXISTS  SaludTotal;
-USE SaludTotal;
+USE SaludTotal;	

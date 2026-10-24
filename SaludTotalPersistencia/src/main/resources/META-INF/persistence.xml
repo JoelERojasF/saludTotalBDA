@@ -4,6 +4,14 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>Entidades.UsuarioEntidad</class>
     <class>Entidades.EmpresaEntidad</class>
+    <class>Entidades.ClienteEntidad</class>
+    <class>Entidades.DoctorEntidad</class>
+    <class>Entidades.SolicitudEntidad</class>
+    <class>Entidades.ResultadoEntidad</class>
+    <class>Entidades.TipoMuestraEntidad</class>
+    <class>Entidades.EstudioEntidad</class>
+    <class>Entidades.ParametroEntidad</class>
+    <class>Entidades.RangoEntidad</class>
     <properties>
       <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/SaludTotal?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="jakarta.persistence.jdbc.user" value="root"/>
