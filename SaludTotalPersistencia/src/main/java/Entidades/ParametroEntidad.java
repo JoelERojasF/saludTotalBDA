@@ -43,6 +43,9 @@ public class ParametroEntidad implements Serializable {
     @Column(name = "valorFinal", nullable = true)
     private Integer valorFinal;
     
+    @Column(name = "numerico", nullable = false)
+    private Boolean numerico;
+    
     @ManyToOne()
     @JoinColumn(name = "idEstudio", nullable = false)
     private EstudioEntidad estudio;
@@ -110,6 +113,14 @@ public class ParametroEntidad implements Serializable {
         this.valorFinal = valorFinal;
     }
 
+    public Boolean getNumerico() {
+        return numerico;
+    }
+
+    public void setNumerico(Boolean numerico) {
+        this.numerico = numerico;
+    }
+
     public EstudioEntidad getEstudio() {
         return estudio;
     }
@@ -136,7 +147,7 @@ public class ParametroEntidad implements Serializable {
 
     @Override
     public String toString() {
-        return "ParametroEntidad{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + '}';
+        return "ParametroEntidad{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + '}';
     }
     
     
