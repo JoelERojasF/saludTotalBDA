@@ -1,6 +1,5 @@
 package com.saludtotalpresentacion;
 
-import Conexion.ConexionBD;
 import DTO.CrearUsuarioDTO;
 import Negocio.IUsuarioNegocio;
 import Negocio.NegocioException;
@@ -19,50 +18,53 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import persistencia.datos.UsuarioDAO;
 
-public class RegistrarClientePresentacion extends JFrame{
-    
+public class RegistrarClientePresentacion extends JFrame {
+
+    private final IUsuarioNegocio usuarioNegocio;
+
     private final CampoTexto txtNombre = new CampoTexto("Value");
     private final CampoPassword txtPassword = new CampoPassword("Value");
     private final CampoPassword txtConfirmar = new CampoPassword("Value");
     private final BotonRedondeado btnVolver = new BotonRedondeado("Volver");
     private final BotonRedondeado btnRegistrar = new BotonRedondeado("Registrar");
- 
+
     public RegistrarClientePresentacion() {
         initComponentes();
         initEventos();
+
+        this.usuarioNegocio = new UsuarioNegocio();
     }
- 
+
     private void initComponentes() {
         setTitle("Salud Total - Registro");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(660, 630);
         setMinimumSize(new Dimension(480, 520));
         setLocationRelativeTo(null);
- 
+
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(java.awt.Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(40, 30, 40, 30));
         setContentPane(panel);
- 
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
- 
+
         JLabel lblTitulo = new JLabel("Registrar Usuario", SwingConstants.CENTER);
         lblTitulo.setFont(new Font(LoginFrame.FUENTE, Font.PLAIN, 18));
         lblTitulo.setForeground(LoginFrame.COLOR_TEXTO);
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 0, 40, 0);
         panel.add(lblTitulo, gbc);
- 
+
         agregarCampo(panel, gbc, 1, "Nombre:", txtNombre, 25);
         agregarCampo(panel, gbc, 3, "Password", txtPassword, 25);
         agregarCampo(panel, gbc, 5, "Confirmar Password", txtConfirmar, 0);
- 
+
         JPanel panelBotones = new JPanel(new GridBagLayout());
         panelBotones.setOpaque(false);
         GridBagConstraints b = new GridBagConstraints();
@@ -72,14 +74,14 @@ public class RegistrarClientePresentacion extends JFrame{
         panelBotones.add(btnVolver, b);
         b.gridx = 1;
         panelBotones.add(btnRegistrar, b);
- 
+
         gbc.gridy = 7;
         gbc.weighty = 1;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(30, 0, 0, 0);
         panel.add(panelBotones, gbc);
     }
- 
+
     private void agregarCampo(JPanel panel, GridBagConstraints gbc, int fila,
             String texto, java.awt.Component campo, int espacioAbajo) {
         JLabel lbl = new JLabel(texto);
@@ -92,22 +94,22 @@ public class RegistrarClientePresentacion extends JFrame{
         gbc.insets = new Insets(0, 0, espacioAbajo, 0);
         panel.add(campo, gbc);
     }
- 
+
     private void initEventos() {
         btnVolver.addActionListener(e -> volver());
         btnRegistrar.addActionListener(e -> registrar());
     }
- 
+
     private void volver() {
         new LoginFrame().setVisible(true);
         dispose();
     }
- 
+
     private void registrar() {
         String nombre = txtNombre.getText().trim();
         String pass = new String(txtPassword.getPassword());
         String confirmar = new String(txtConfirmar.getPassword());
- 
+
         if (nombre.isEmpty() || pass.isEmpty() || confirmar.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Llena todos los campos.",
                     "Campos vacios", JOptionPane.WARNING_MESSAGE);
@@ -118,10 +120,11 @@ public class RegistrarClientePresentacion extends JFrame{
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
- 
+
         try {
-            IUsuarioNegocio usuarioNegocio = new UsuarioNegocio(new UsuarioDAO(new ConexionBD()));
-            usuarioNegocio.registrarUsuario(new CrearUsuarioDTO(nombre, pass));
+            CrearUsuarioDTO dto = new CrearUsuarioDTO(nombre, pass);
+            usuarioNegocio.registrarUsuario(dto);
+
             JOptionPane.showMessageDialog(this, "Usuario registrado correctamente.");
             volver();
         } catch (NegocioException ex) {

@@ -17,25 +17,25 @@ import java.io.Serializable;
  * @author le0jx
  */
 @Entity
-@Table(name = "tblUsuarios") 
+@Table(name = "tblUsuarios")
 public class UsuarioEntidad implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    
+
     @Column(name = "nombre", nullable = false)
     private String nombre;
 
     @Column(name = "contraseña", nullable = false)
     private String contraseña;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -68,6 +68,4 @@ public class UsuarioEntidad implements Serializable {
         return "UsuarioEntidad{" + "id=" + id + ", nombre=" + nombre + ", contrase\u00f1a=" + contraseña + '}';
     }
 
-    
-    
 }

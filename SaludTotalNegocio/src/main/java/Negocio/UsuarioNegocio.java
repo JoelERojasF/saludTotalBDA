@@ -1,21 +1,22 @@
 package Negocio;
 
+import Conexion.ConexionBD;
 import DTO.CrearUsuarioDTO;
 import DTO.UsuarioDTO;
 import Entidades.UsuarioEntidad;
 import org.mindrot.jbcrypt.BCrypt;
 import persistencia.datos.IUsuarioDAO;
 import persistencia.datos.PersistenciaException;
+import persistencia.datos.UsuarioDAO;
 
+public class UsuarioNegocio implements IUsuarioNegocio {
 
-public class UsuarioNegocio implements IUsuarioNegocio{
-    
     private static final String CREDENCIALES_INVALIDAS = "Nombre o password incorrectos.";
 
     private final IUsuarioDAO usuarioDAO;
 
-    public UsuarioNegocio(IUsuarioDAO usuarioDAO) {
-        this.usuarioDAO = usuarioDAO;
+    public UsuarioNegocio() {
+        this.usuarioDAO = new UsuarioDAO(new ConexionBD());
     }
 
     @Override
@@ -71,5 +72,5 @@ public class UsuarioNegocio implements IUsuarioNegocio{
     private UsuarioDTO aDTO(UsuarioEntidad u) {
         return new UsuarioDTO(u.getId(), u.getNombre());
     }
-    
+
 }
