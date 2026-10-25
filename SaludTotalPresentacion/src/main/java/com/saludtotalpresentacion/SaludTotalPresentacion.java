@@ -4,6 +4,8 @@
 
 package com.saludtotalpresentacion;
 
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author le0jx
@@ -11,6 +13,6 @@ package com.saludtotalpresentacion;
 public class SaludTotalPresentacion {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }
