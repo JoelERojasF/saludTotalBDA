@@ -1,4 +1,4 @@
-package DTO;
+package DTO.Crear;
 
 
 public class CrearUsuarioDTO {

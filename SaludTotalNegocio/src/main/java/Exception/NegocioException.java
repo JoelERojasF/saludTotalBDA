@@ -1,4 +1,4 @@
-package Negocio;
+package Exception;
 
 
 public class NegocioException extends Exception {

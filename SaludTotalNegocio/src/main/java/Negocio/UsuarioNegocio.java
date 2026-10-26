@@ -1,7 +1,9 @@
 package Negocio;
 
+import Exception.NegocioException;
+import Negocio.Interfaces.IUsuarioNegocio;
 import Conexion.ConexionBD;
-import DTO.CrearUsuarioDTO;
+import DTO.Crear.CrearUsuarioDTO;
 import DTO.UsuarioDTO;
 import Entidades.UsuarioEntidad;
 import org.mindrot.jbcrypt.BCrypt;
@@ -64,7 +66,6 @@ public class UsuarioNegocio implements IUsuarioNegocio {
         try {
             return hashGuardado != null && BCrypt.checkpw(password, hashGuardado);
         } catch (IllegalArgumentException e) {
-            // El valor guardado no es un hash BCrypt (usuario viejo en texto plano).
             return false;
         }
     }

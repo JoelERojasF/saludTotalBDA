@@ -27,7 +27,7 @@ public class EmpresaEntidad implements Serializable {
     @Column(name = "nombre", nullable = false)
     private String nombre;
     
-    @Column(name = "direccion", nullable = true)
+    @Column(name = "direccion", nullable = false)
     private String direcion;
     
     @Column(name = "correo", nullable = true)
@@ -36,10 +36,10 @@ public class EmpresaEntidad implements Serializable {
     @Column(name = "telefono", nullable = true)
     private String telefono;
     
-    @Column(name = "rfc", nullable = true)
+    @Column(name = "rfc", nullable = false)
     private String rfc;
     
-    @Column(name = "cedula", nullable = true)
+    @Column(name = "cedula", nullable = false)
     private String cedula;
 
     public EmpresaEntidad() {

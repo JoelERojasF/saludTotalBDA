@@ -1,7 +1,8 @@
-package Negocio;
+package Negocio.Interfaces;
 
-import DTO.CrearUsuarioDTO;
+import DTO.Crear.CrearUsuarioDTO;
 import DTO.UsuarioDTO;
+import Exception.NegocioException;
 
 
 public interface IUsuarioNegocio {

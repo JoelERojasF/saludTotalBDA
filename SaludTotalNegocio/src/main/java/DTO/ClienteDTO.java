@@ -9,7 +9,7 @@ public class ClienteDTO {
     private String nombre;
     private String apellidoPaterno;
     private String apellidoMaterno;
-    private Date fechaNacimiento;
+    private String fechaNacimiento;
     private String sexo;
     private String tipoSangre;
 
@@ -17,7 +17,7 @@ public class ClienteDTO {
     }
 
     public ClienteDTO(Integer id, String nombre, String apellidoPaterno, String apellidoMaterno,
-            Date fechaNacimiento, String sexo, String tipoSangre) {
+            String fechaNacimiento, String sexo, String tipoSangre) {
         this.id = id;
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
@@ -59,11 +59,11 @@ public class ClienteDTO {
         this.apellidoMaterno = apellidoMaterno;
     }
 
-    public Date getFechaNacimiento() {
+    public String getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(Date fechaNacimiento) {
+    public void setFechaNacimiento(String fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 
@@ -82,5 +82,11 @@ public class ClienteDTO {
     public void setTipoSangre(String tipoSangre) {
         this.tipoSangre = tipoSangre;
     }
+
+    @Override
+    public String toString() {
+        return "ClienteDTO{" + "id=" + id + ", nombre=" + nombre + ", apellidoPaterno=" + apellidoPaterno + ", apellidoMaterno=" + apellidoMaterno + ", fechaNacimiento=" + fechaNacimiento + ", sexo=" + sexo + ", tipoSangre=" + tipoSangre + '}';
+    }
+    
     
 }

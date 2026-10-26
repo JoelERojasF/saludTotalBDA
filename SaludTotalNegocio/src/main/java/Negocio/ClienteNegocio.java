@@ -1,75 +1,80 @@
 package Negocio;
 
+import Exception.NegocioException;
+import Negocio.Interfaces.IClienteNegocio;
 import DTO.ClienteDTO;
-import DTO.CrearClienteDTO;
+import DTO.Crear.CrearClienteDTO;
 import Entidades.ClienteEntidad;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.util.List;
 import Daos.Interfaces.IClienteDAO;
+import Validador.Validador;
 import exception.PersistenciaException;
-
-
-
 
 
 public class ClienteNegocio implements IClienteNegocio{
     
     private final IClienteDAO clienteDAO;
+    Validador val = new Validador();
 
     public ClienteNegocio(IClienteDAO clienteDAO) {
         this.clienteDAO = clienteDAO;
     }
 
     @Override
-    public ClienteDTO registrarCliente(CrearClienteDTO dto) throws NegocioException {
+    public ClienteDTO registrar(CrearClienteDTO dto) throws NegocioException {
         if (dto == null) {
             throw new NegocioException("No se recibieron los datos del cliente.");
         }
         validar(dto.getNombre(), dto.getFechaNacimiento(), dto.getSexo(), dto.getTipoSangre());
+        if (!val.validarNombrePersona(dto.getApellidoPaterno())) {
+            dto.setApellidoPaterno(null);
+        }
+        if (!val.validarNombrePersona(dto.getApellidoMaterno())) {
+            dto.setApellidoMaterno(null);
+        }
 
-        ClienteEntidad entidad = new ClienteEntidad(
-                dto.getNombre().trim(),
-                vacioANulo(dto.getApellidoPaterno()),
-                vacioANulo(dto.getApellidoMaterno()),
-                new Date(dto.getFechaNacimiento().getTime()),
-                dto.getSexo(),
-                dto.getTipoSangre());
+        ClienteEntidad entidad = DTOAEntidad(dto);
         try {
-            return aDTO(clienteDAO.guardar(entidad));
+            return EntidadADTO(clienteDAO.guardar(entidad));
         } catch (PersistenciaException e) {
             throw new NegocioException("No se pudo registrar el cliente. Revisa la conexion con la base de datos.", e);
         }
     }
 
     @Override
-    public ClienteDTO actualizarCliente(ClienteDTO dto) throws NegocioException {
+    public ClienteDTO actualizar(ClienteDTO dto) throws NegocioException {
         if (dto == null || dto.getId() == null) {
             throw new NegocioException("Falta el id del cliente a actualizar.");
         }
         validar(dto.getNombre(), dto.getFechaNacimiento(), dto.getSexo(), dto.getTipoSangre());
+        if (!val.validarNombrePersona(dto.getApellidoPaterno())) {
+            dto.setApellidoPaterno(null);
+        }
+        if (!val.validarNombrePersona(dto.getApellidoMaterno())) {
+            dto.setApellidoMaterno(null);
+        }
+        
         try {
             if (clienteDAO.buscarPorId(dto.getId()) == null) {
                 throw new NegocioException("El cliente que intentas actualizar no existe.");
             }
-            ClienteEntidad entidad = new ClienteEntidad(
-                    dto.getNombre().trim(),
-                    vacioANulo(dto.getApellidoPaterno()),
-                    vacioANulo(dto.getApellidoMaterno()),
-                    new Date(dto.getFechaNacimiento().getTime()),
-                    dto.getSexo(),
-                    dto.getTipoSangre());
+            ClienteEntidad entidad = DTOAEntidad(dto);
             entidad.setId(dto.getId());
-            return aDTO(clienteDAO.actualizar(entidad));
+            return EntidadADTO(clienteDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
             throw new NegocioException("No se pudo actualizar el cliente.", e);
         }
     }
 
     @Override
-    public void eliminarCliente(Integer id) throws NegocioException {
+    public void eliminar(Integer id) throws NegocioException {
         if (id == null) {
             throw new NegocioException("Falta el id del cliente a eliminar.");
+        }
+        if (id <= 0) {
+            throw new NegocioException("El id es invalido.");
         }
         try {
             if (clienteDAO.buscarPorId(id) == null) {
@@ -86,12 +91,15 @@ public class ClienteNegocio implements IClienteNegocio{
         if (id == null) {
             throw new NegocioException("Falta el id del cliente.");
         }
+        if (id <= 0) {
+            throw new NegocioException("El id es invalido.");
+        }
         try {
-            ClienteEntidad cliente = clienteDAO.buscarPorId(id);
-            if (cliente == null) {
+            ClienteEntidad entidad = clienteDAO.buscarPorId(id);
+            if (entidad == null) {
                 throw new NegocioException("No se encontro el cliente.");
             }
-            return aDTO(cliente);
+            return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
             throw new NegocioException("No se pudo consultar el cliente.", e);
         }
@@ -102,7 +110,7 @@ public class ClienteNegocio implements IClienteNegocio{
         try {
             List<ClienteDTO> lista = new ArrayList<>();
             for (ClienteEntidad e : clienteDAO.obtenerTodos()) {
-                lista.add(aDTO(e));
+                lista.add(EntidadADTO(e));
             }
             return lista;
         } catch (PersistenciaException e) {
@@ -110,42 +118,53 @@ public class ClienteNegocio implements IClienteNegocio{
         }
     }
 
-    // ---------------- Validaciones ----------------
-
-    private void validar(String nombre, java.util.Date fechaNacimiento,
-            String sexo, String tipoSangre) throws NegocioException {
-        if (nombre == null || nombre.isBlank()) {
-            throw new NegocioException("El nombre es obligatorio.");
+    private void validar(String nombre, String fechaNacimiento, String sexo, String tipoSangre) throws NegocioException {
+        if (!val.validarNombrePersona(nombre)) {
+            throw new NegocioException("El nombre es invalido.");
         }
-        if (fechaNacimiento == null) {
-            throw new NegocioException("La fecha de nacimiento es obligatoria.");
+        if (!val.validarFormatoFecha(fechaNacimiento)) {
+            throw new NegocioException("La fecha de nacimiento es invalida.");
         }
-        if (fechaNacimiento.after(new java.util.Date())) {
+        if (Date.valueOf(fechaNacimiento).after(new java.util.Date())) {
             throw new NegocioException("La fecha de nacimiento no puede ser futura.");
         }
-        if (sexo == null || sexo.isBlank()) {
-            throw new NegocioException("El sexo es obligatorio.");
+        if (!val.validarSexo(sexo)) {
+            throw new NegocioException("El sexo es invalido.");
         }
-        if (tipoSangre == null || tipoSangre.isBlank()) {
-            throw new NegocioException("El tipo de sangre es obligatorio.");
+        if (!val.validarTipoSangre(tipoSangre)) {
+            throw new NegocioException("El tipo de sangre es invalido.");
         }
     }
 
-    // ---------------- Conversion Entidad -> DTO ----------------
-
-    private ClienteDTO aDTO(ClienteEntidad e) {
+    private ClienteDTO EntidadADTO(ClienteEntidad e) {
         return new ClienteDTO(
                 e.getId(),
                 e.getNombre(),
                 e.getApellidoPaterno(),
                 e.getApellidoMaterno(),
-                e.getFechaNacimiento(),
+                e.getFechaNacimiento().toString(),
                 e.getSexo(),
                 e.getTipoSangre());
     }
-
-    private String vacioANulo(String texto) {
-        return (texto == null || texto.isBlank()) ? null : texto.trim();
+    
+    private ClienteEntidad DTOAEntidad(ClienteDTO dto){
+        return new ClienteEntidad(
+                    dto.getNombre().trim(),
+                    val.vacioANulo(dto.getApellidoPaterno()),
+                    val.vacioANulo(dto.getApellidoMaterno()),
+                    Date.valueOf(dto.getFechaNacimiento()),
+                    dto.getSexo(),
+                    dto.getTipoSangre());
     }
     
+    private ClienteEntidad DTOAEntidad(CrearClienteDTO dto){
+        return new ClienteEntidad(
+                    dto.getNombre().trim(),
+                    val.vacioANulo(dto.getApellidoPaterno()),
+                    val.vacioANulo(dto.getApellidoMaterno()),
+                    Date.valueOf(dto.getFechaNacimiento()),
+                    dto.getSexo(),
+                    dto.getTipoSangre());
+    }
+
 }

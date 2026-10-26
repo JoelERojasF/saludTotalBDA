@@ -1,28 +1,24 @@
-package DTO;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package DTO.Crear;
 
-import java.util.Date;
-
-
-public class CrearClienteDTO {
-    
+/**
+ *
+ * @author le0jx
+ */
+public class CrearDoctorDTO {
     private String nombre;
     private String apellidoPaterno;
     private String apellidoMaterno;
-    private Date fechaNacimiento;
     private String sexo;
-    private String tipoSangre;
 
-    public CrearClienteDTO() {
-    }
-
-    public CrearClienteDTO(String nombre, String apellidoPaterno, String apellidoMaterno,
-            Date fechaNacimiento, String sexo, String tipoSangre) {
+    public CrearDoctorDTO(String nombre, String apellidoPaterno, String apellidoMaterno, String sexo) {
         this.nombre = nombre;
         this.apellidoPaterno = apellidoPaterno;
         this.apellidoMaterno = apellidoMaterno;
-        this.fechaNacimiento = fechaNacimiento;
         this.sexo = sexo;
-        this.tipoSangre = tipoSangre;
     }
 
     public String getNombre() {
@@ -49,14 +45,6 @@ public class CrearClienteDTO {
         this.apellidoMaterno = apellidoMaterno;
     }
 
-    public Date getFechaNacimiento() {
-        return fechaNacimiento;
-    }
-
-    public void setFechaNacimiento(Date fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
-    }
-
     public String getSexo() {
         return sexo;
     }
@@ -65,12 +53,10 @@ public class CrearClienteDTO {
         this.sexo = sexo;
     }
 
-    public String getTipoSangre() {
-        return tipoSangre;
+    @Override
+    public String toString() {
+        return "CrearDoctorDTO{" + "nombre=" + nombre + ", apellidoPaterno=" + apellidoPaterno + ", apellidoMaterno=" + apellidoMaterno + ", sexo=" + sexo + '}';
     }
-
-    public void setTipoSangre(String tipoSangre) {
-        this.tipoSangre = tipoSangre;
-    }
+    
     
 }
