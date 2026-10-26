@@ -28,22 +28,21 @@ public class SaludTotalPersistencia {
         IConexionBD conexion = new ConexionBD();
         ClienteDAO cDAO = new ClienteDAO(conexion);
         DoctorDAO dDao = new DoctorDAO(conexion);
-        
+
         ClienteEntidad c1 = new ClienteEntidad("Daniela", "López", "Valenzuela", new Date(1998, 4, 12), "Femenino", "O+");
         ClienteEntidad c2 = new ClienteEntidad("Carlos Alberto", "Méndez", "Ibarra", new Date(1987, 3, 11), "Masculino", "A+");
-        
+
         DoctorEntidad d1 = new DoctorEntidad("Arturo", "Zamora", "Fuentes", "Masculino");
         DoctorEntidad d2 = new DoctorEntidad("Alejandra", "Paredes", "León", "Femenino");
-        
+
         dDao.guardar(d1);
         dDao.guardar(d2);
-        
+
+        cDAO.guardar(c1);
+        cDAO.guardar(c2);
+
         System.out.println(dDao.obtenerTodos());
-        
-        
-        
-        
-        
+
 //        EntityManager em = conexion.crearConexion();
 //        em.getTransaction().begin();
 //

@@ -1,8 +1,8 @@
 package com.saludtotalpresentacion;
 
-import DTO.CrearUsuarioDTO;
-import Negocio.IUsuarioNegocio;
-import Negocio.NegocioException;
+import DTO.Crear.CrearUsuarioDTO;
+import Exception.NegocioException;
+import Negocio.Interfaces.IUsuarioNegocio;
 import Negocio.UsuarioNegocio;
 import com.saludtotalpresentacion.LoginFrame.BotonRedondeado;
 import com.saludtotalpresentacion.LoginFrame.CampoPassword;
@@ -19,7 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-public class RegistrarClientePresentacion extends JFrame {
+public class RegistrarAdminPresentacion extends JFrame {
 
     private final IUsuarioNegocio usuarioNegocio;
 
@@ -29,7 +29,7 @@ public class RegistrarClientePresentacion extends JFrame {
     private final BotonRedondeado btnVolver = new BotonRedondeado("Volver");
     private final BotonRedondeado btnRegistrar = new BotonRedondeado("Registrar");
 
-    public RegistrarClientePresentacion() {
+    public RegistrarAdminPresentacion() {
         initComponentes();
         initEventos();
 

@@ -3,7 +3,13 @@
  */
 package com.saludtotalpresentacion;
 
+import DTO.ClienteDTO;
+import DTO.DoctorDTO;
 import DTO.UsuarioDTO;
+import Exception.NegocioException;
+import Negocio.FabricaNegocio;
+import Negocio.Interfaces.IClienteNegocio;
+import Negocio.Interfaces.IDoctorNegocio;
 import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
 import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
 import java.awt.BorderLayout;
@@ -13,18 +19,24 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 /**
  *
@@ -34,17 +46,30 @@ public class SolicitudesFrame extends JFrame {
 
     private UsuarioDTO usuarioActual;
 
+    private final IClienteNegocio clienteNegocio;
+    private final IDoctorNegocio doctorNegocio;
+
+    private List<ClienteDTO> listaClientes = new ArrayList<>();
+    private List<DoctorDTO> listaDoctores = new ArrayList<>();
+
     private final Color COLOR_BOTON = new Color(51, 51, 51);
     private final Font FUENTE_TITULO = new Font("Segoe UI", Font.BOLD, 22);
 
+    private DefaultTableModel modeloTabla;
+    private DefaultTableModel modeloDetalles;
+
+    private boolean ajustandoSeleccion = false;
+
     public SolicitudesFrame(UsuarioDTO usuario) {
         this.usuarioActual = usuario;
+        this.clienteNegocio = FabricaNegocio.crearClienteNegocio();
+        this.doctorNegocio = FabricaNegocio.crearDoctorNegocio();
 
         setTitle("Salud Total - Solicitudes");
-        setSize(900, 720);
+        setSize(900, 780);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setMinimumSize(new Dimension(480, 520));
+        setMinimumSize(new Dimension(500, 600));
 
         JPanel panelPrincipal = new JPanel();
         panelPrincipal.setLayout(new BoxLayout(panelPrincipal, BoxLayout.Y_AXIS));
@@ -63,8 +88,13 @@ public class SolicitudesFrame extends JFrame {
         JPanel pnlBtnRegistrar = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pnlBtnRegistrar.setBackground(COLOR_FONDO);
 
-        ////////////////////////////////////////////
         JButton btnRegistrar = crearBotonOscuro("Registrar solicitud");
+
+        btnRegistrar.addActionListener(e -> {
+            RegistrarSolicitudFrame registrarFrame = new RegistrarSolicitudFrame(usuarioActual);
+            registrarFrame.setVisible(true);
+            this.dispose();
+        });
 
         pnlBtnRegistrar.add(btnRegistrar);
 
@@ -77,8 +107,130 @@ public class SolicitudesFrame extends JFrame {
         panelPrincipal.add(crearBotonesInferiores());
 
         setContentPane(panelPrincipal);
+
+        cargarDatos();
     }
 
+    private void cargarDatos() {
+        modeloTabla.setRowCount(0);
+        modeloDetalles.setRowCount(0);
+        try {
+            listaClientes = clienteNegocio.obtenerTodos();
+            listaDoctores = doctorNegocio.obtenerTodos();
+
+            int limite = Math.max(listaClientes.size(), listaDoctores.size());
+
+            for (int i = 0; i < limite; i++) {
+                String nombrePaciente = "";
+                if (i < listaClientes.size()) {
+                    nombrePaciente = nombreCompleto(listaClientes.get(i));
+                }
+
+                String nombreDoctor = "";
+                if (i < listaDoctores.size()) {
+                    nombreDoctor = "DR. " + nombreCompletoDoctor(listaDoctores.get(i));
+                }
+
+                String vacio = "";
+
+                modeloTabla.addRow(new Object[]{
+                    false,
+                    nombrePaciente,
+                    vacio,
+                    nombreDoctor
+                });
+            }
+        } catch (NegocioException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "No se pudieron cargar los registros", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void mostrarDetallesFila(int fila) {
+        modeloDetalles.setRowCount(0);
+
+        if (fila < 0 || fila >= modeloTabla.getRowCount()) {
+            return;
+        }
+
+        ClienteDTO cliente = null;
+        if (fila < listaClientes.size()) {
+            cliente = listaClientes.get(fila);
+        }
+
+        DoctorDTO doctor = null;
+        if (fila < listaDoctores.size()) {
+            doctor = listaDoctores.get(fila);
+        }
+
+        String textoPaciente = "";
+        if (cliente != null) {
+            String sexo = "";
+            if (cliente.getSexo() != null) {
+                sexo = cliente.getSexo();
+            }
+
+            String fechaNacimiento = "";
+            if (cliente.getFechaNacimiento() != null) {
+                fechaNacimiento = cliente.getFechaNacimiento();
+            }
+
+            String tipoSangre = "";
+            if (cliente.getTipoSangre() != null) {
+                tipoSangre = cliente.getTipoSangre();
+            }
+
+            textoPaciente = nombreCompleto(cliente) + "\n\n"
+                    + "Sexo: " + sexo + "\n\n"
+                    + "Fecha nacimiento:\n" + fechaNacimiento + "\n\n"
+                    + "Tipo Sangre: " + tipoSangre;
+        }
+
+        String textoDoctor = "";
+        if (doctor != null) {
+            String sexo = "";
+            if (doctor.getSexo() != null) {
+                sexo = doctor.getSexo();
+            }
+
+            textoDoctor = "DR. " + nombreCompletoDoctor(doctor) + "\n\n"
+                    + "Sexo: " + sexo;
+        }
+
+        String solicitud = (String) modeloTabla.getValueAt(fila, 2);
+        String resultado = "";
+
+        modeloDetalles.addRow(new Object[]{
+            textoPaciente,
+            textoDoctor,
+            solicitud,
+            resultado
+        });
+    }
+
+    private String nombreCompleto(ClienteDTO c) {
+        StringBuilder sb = new StringBuilder(c.getNombre());
+        if (c.getApellidoPaterno() != null) {
+            sb.append(" ").append(c.getApellidoPaterno());
+        }
+        if (c.getApellidoMaterno() != null) {
+            sb.append(" ").append(c.getApellidoMaterno());
+        }
+        return sb.toString();
+    }
+
+    private String nombreCompletoDoctor(DoctorDTO d) {
+        StringBuilder sb = new StringBuilder(d.getNombre());
+        if (d.getApellidoPaterno() != null) {
+            sb.append(" ").append(d.getApellidoPaterno());
+        }
+        if (d.getApellidoMaterno() != null) {
+            sb.append(" ").append(d.getApellidoMaterno());
+        }
+        return sb.toString();
+    }
+
+    // UI
     private JPanel crearBarraNavegacion() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 0));
         panel.setBackground(COLOR_FONDO);
@@ -127,7 +279,8 @@ public class SolicitudesFrame extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(COLOR_FONDO);
 
-        DefaultTableModel modelo = new DefaultTableModel(new Object[]{"Sel", "Datos de Solicitud"}, 0) {
+        modeloTabla = new DefaultTableModel(
+                new Object[]{"Sel", "Paciente", "Solicitud", "Doctor"}, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 0) {
@@ -139,16 +292,46 @@ public class SolicitudesFrame extends JFrame {
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                if (column == 0) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return column == 0;
             }
         };
 
-        JTable tabla = new JTable(modelo);
-        tabla.setRowHeight(25);
+        modeloTabla.addTableModelListener(e -> {
+            if (ajustandoSeleccion) {
+                return;
+            }
+
+            if (e.getColumn() == 0 && e.getType() == TableModelEvent.UPDATE) {
+                int filaModificada = e.getFirstRow();
+                Boolean estaMarcado = (Boolean) modeloTabla.getValueAt(filaModificada, 0);
+
+                if (Boolean.TRUE.equals(estaMarcado)) {
+                    ajustandoSeleccion = true;
+                    for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+                        if (i != filaModificada) {
+                            modeloTabla.setValueAt(false, i, 0);
+                        }
+                    }
+                    ajustandoSeleccion = false;
+                    mostrarDetallesFila(filaModificada);
+                } else {
+                    boolean algunaSeleccionada = false;
+                    for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+                        if (Boolean.TRUE.equals(modeloTabla.getValueAt(i, 0))) {
+                            algunaSeleccionada = true;
+                            mostrarDetallesFila(i);
+                            break;
+                        }
+                    }
+                    if (!algunaSeleccionada) {
+                        modeloDetalles.setRowCount(0);
+                    }
+                }
+            }
+        });
+
+        JTable tabla = new JTable(modeloTabla);
+        tabla.setRowHeight(28);
         tabla.setShowGrid(false);
         tabla.getColumnModel().getColumn(0).setMaxWidth(40);
 
@@ -171,7 +354,7 @@ public class SolicitudesFrame extends JFrame {
 
         String[] columnas = {"Paciente", "Doctor", "Solicitud", "Resultado"};
 
-        DefaultTableModel modeloDetalles = new DefaultTableModel(null, columnas) {
+        modeloDetalles = new DefaultTableModel(null, columnas) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -179,7 +362,8 @@ public class SolicitudesFrame extends JFrame {
         };
 
         JTable tablaDetalles = new JTable(modeloDetalles);
-        tablaDetalles.setRowHeight(24);
+
+        tablaDetalles.setRowHeight(160);
         tablaDetalles.setShowGrid(false);
         tablaDetalles.setBackground(COLOR_FONDO);
         tablaDetalles.setOpaque(true);
@@ -189,8 +373,33 @@ public class SolicitudesFrame extends JFrame {
         tablaDetalles.getTableHeader().setBackground(COLOR_FONDO);
         tablaDetalles.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
+        tablaDetalles.setDefaultRenderer(Object.class, new TableCellRenderer() {
+            private final JTextArea textArea = new JTextArea();
+
+            {
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
+                textArea.setOpaque(true);
+                textArea.setBorder(new EmptyBorder(10, 10, 10, 10));
+                textArea.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                if (value != null) {
+                    textArea.setText(value.toString());
+                } else {
+                    textArea.setText("");
+                }
+
+                textArea.setBackground(table.getBackground());
+                textArea.setForeground(table.getForeground());
+                return textArea;
+            }
+        });
+
         JScrollPane scrollDetalles = new JScrollPane(tablaDetalles);
-        scrollDetalles.setPreferredSize(new Dimension(830, 130));
+        scrollDetalles.setPreferredSize(new Dimension(830, 200));
         scrollDetalles.getViewport().setBackground(COLOR_FONDO);
         scrollDetalles.setBorder(BorderFactory.createEmptyBorder());
 
@@ -224,5 +433,4 @@ public class SolicitudesFrame extends JFrame {
         boton.setPreferredSize(new Dimension(140, 40));
         return boton;
     }
-
 }

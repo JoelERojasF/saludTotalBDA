@@ -22,6 +22,13 @@ public class Validador {
         return texto.trim().matches(patron);
     }
     
+    public boolean validarApellido(String texto){
+        if(texto == null || texto.isEmpty()) return false;
+        
+        String patron = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]{1,50}$";
+        return texto.trim().matches(patron);
+    }
+    
     public boolean validarTexto(String texto){
         if(texto == null || texto.isEmpty()) return false;
         

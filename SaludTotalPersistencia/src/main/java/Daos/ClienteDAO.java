@@ -7,7 +7,6 @@ import Entidades.ClienteEntidad;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 
-
 public class ClienteDAO implements IClienteDAO {
 
     private final IConexionBD conexion;
@@ -107,5 +106,5 @@ public class ClienteDAO implements IClienteDAO {
             em.close();
         }
     }
-    
+
 }

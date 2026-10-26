@@ -1,7 +1,7 @@
 package com.saludtotalpresentacion;
 
 import DTO.UsuarioDTO;
-import Negocio.IUsuarioNegocio;
+import Negocio.Interfaces.IUsuarioNegocio;
 import Negocio.UsuarioNegocio;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -157,7 +157,7 @@ public class LoginFrame extends JFrame {
     }
 
     private void registrar() {
-        new RegistrarClientePresentacion().setVisible(true); // abre el otro frame
+        new RegistrarAdminPresentacion().setVisible(true); // abre el otro frame
         dispose();                            // cierra el login
     }
 

@@ -12,9 +12,8 @@ import Daos.Interfaces.IClienteDAO;
 import Validador.Validador;
 import exception.PersistenciaException;
 
+public class ClienteNegocio implements IClienteNegocio {
 
-public class ClienteNegocio implements IClienteNegocio{
-    
     private final IClienteDAO clienteDAO;
     Validador val = new Validador();
 
@@ -55,7 +54,7 @@ public class ClienteNegocio implements IClienteNegocio{
         if (!val.validarNombrePersona(dto.getApellidoMaterno())) {
             dto.setApellidoMaterno(null);
         }
-        
+
         try {
             if (clienteDAO.buscarPorId(dto.getId()) == null) {
                 throw new NegocioException("El cliente que intentas actualizar no existe.");
@@ -146,25 +145,25 @@ public class ClienteNegocio implements IClienteNegocio{
                 e.getSexo(),
                 e.getTipoSangre());
     }
-    
-    private ClienteEntidad DTOAEntidad(ClienteDTO dto){
+
+    private ClienteEntidad DTOAEntidad(ClienteDTO dto) {
         return new ClienteEntidad(
-                    dto.getNombre().trim(),
-                    val.vacioANulo(dto.getApellidoPaterno()),
-                    val.vacioANulo(dto.getApellidoMaterno()),
-                    Date.valueOf(dto.getFechaNacimiento()),
-                    dto.getSexo(),
-                    dto.getTipoSangre());
+                dto.getNombre().trim(),
+                val.vacioANulo(dto.getApellidoPaterno()),
+                val.vacioANulo(dto.getApellidoMaterno()),
+                Date.valueOf(dto.getFechaNacimiento()),
+                dto.getSexo(),
+                dto.getTipoSangre());
     }
-    
-    private ClienteEntidad DTOAEntidad(CrearClienteDTO dto){
+
+    private ClienteEntidad DTOAEntidad(CrearClienteDTO dto) {
         return new ClienteEntidad(
-                    dto.getNombre().trim(),
-                    val.vacioANulo(dto.getApellidoPaterno()),
-                    val.vacioANulo(dto.getApellidoMaterno()),
-                    Date.valueOf(dto.getFechaNacimiento()),
-                    dto.getSexo(),
-                    dto.getTipoSangre());
+                dto.getNombre().trim(),
+                val.vacioANulo(dto.getApellidoPaterno()),
+                val.vacioANulo(dto.getApellidoMaterno()),
+                Date.valueOf(dto.getFechaNacimiento()),
+                dto.getSexo(),
+                dto.getTipoSangre());
     }
 
 }
