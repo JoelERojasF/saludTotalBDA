@@ -6,8 +6,8 @@ import Entidades.ClienteEntidad;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.util.List;
-import persistencia.datos.IClienteDAO;
-import persistencia.datos.PersistenciaException;
+import Daos.Interfaces.IClienteDAO;
+import exception.PersistenciaException;
 
 
 

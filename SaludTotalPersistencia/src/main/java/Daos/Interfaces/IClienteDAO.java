@@ -1,5 +1,6 @@
-package persistencia.datos;
+package Daos.Interfaces;
 
+import exception.PersistenciaException;
 import Entidades.ClienteEntidad;
 import java.util.List;
 
@@ -11,7 +12,7 @@ public interface IClienteDAO {
 
     void eliminar(Integer id) throws PersistenciaException;
 
-    ClienteEntidad buscarPorId(Integer id) throws PersistenciaException; // null si no existe
+    ClienteEntidad buscarPorId(Integer id) throws PersistenciaException;
 
     List<ClienteEntidad> obtenerTodos() throws PersistenciaException;
 }

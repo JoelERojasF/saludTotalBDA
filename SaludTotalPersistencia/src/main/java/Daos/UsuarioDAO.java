@@ -1,5 +1,7 @@
-package persistencia.datos;
+package Daos;
 
+import Daos.Interfaces.IUsuarioDAO;
+import exception.PersistenciaException;
 import Conexion.IConexionBD;
 import Entidades.UsuarioEntidad;
 import jakarta.persistence.EntityManager;

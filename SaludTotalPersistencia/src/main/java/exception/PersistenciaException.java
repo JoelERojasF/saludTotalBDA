@@ -1,4 +1,4 @@
-package persistencia.datos;
+package exception;
 
 
 public class PersistenciaException extends Exception{

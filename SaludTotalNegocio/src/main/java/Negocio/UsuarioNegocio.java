@@ -5,9 +5,9 @@ import DTO.CrearUsuarioDTO;
 import DTO.UsuarioDTO;
 import Entidades.UsuarioEntidad;
 import org.mindrot.jbcrypt.BCrypt;
-import persistencia.datos.IUsuarioDAO;
-import persistencia.datos.PersistenciaException;
-import persistencia.datos.UsuarioDAO;
+import Daos.Interfaces.IUsuarioDAO;
+import exception.PersistenciaException;
+import Daos.UsuarioDAO;
 
 public class UsuarioNegocio implements IUsuarioNegocio {
 
