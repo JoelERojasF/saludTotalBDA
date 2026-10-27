@@ -16,6 +16,8 @@ import java.util.List;
 public interface IEstudioNegocio {
     EstudioDTO registrar(CrearEstudioDTO dto) throws NegocioException;
 
+    EstudioDTO registrarCompleto(CrearEstudioDTO dto) throws NegocioException;
+
     EstudioDTO actualizar(EstudioDTO dto) throws NegocioException;
 
     void eliminar(Integer id) throws NegocioException;

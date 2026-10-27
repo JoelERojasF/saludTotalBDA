@@ -7,6 +7,9 @@ package Negocio;
 import Conexion.ConexionBD;
 import DTO.Crear.CrearSolicitudDTO;
 import DTO.SolicitudDTO;
+import Daos.ClienteDAO;
+import Daos.DoctorDAO;
+import Daos.EstudioDAO;
 import Daos.Interfaces.IClienteDAO;
 import Daos.Interfaces.IDoctorDAO;
 import Daos.Interfaces.IEstudioDAO;
@@ -25,7 +28,8 @@ import java.util.List;
  *
  * @author le0jx
  */
-public class SolicitudNegocio implements ISolicitudNegocio{
+public class SolicitudNegocio implements ISolicitudNegocio {
+
     private final ISolicitudDAO solicitudDAO;
     private IDoctorDAO doctorDAO;
     private IClienteDAO clienteDAO;
@@ -33,7 +37,11 @@ public class SolicitudNegocio implements ISolicitudNegocio{
     Validador val = new Validador();
 
     public SolicitudNegocio() {
-        this.solicitudDAO = new SolicitudDAO(new ConexionBD());
+        ConexionBD conexion = new ConexionBD();
+        this.solicitudDAO = new SolicitudDAO(conexion);
+        this.clienteDAO = new ClienteDAO(conexion);
+        this.doctorDAO = new DoctorDAO(conexion);
+        this.estudioDAO = new EstudioDAO(conexion);
     }
 
     @Override
@@ -41,7 +49,7 @@ public class SolicitudNegocio implements ISolicitudNegocio{
         if (dto == null) {
             throw new NegocioException("No se recibieron los datos de la solicitud.");
         }
-        validar(dto.getFolio(),dto.getFechaHoraGeneracion() , dto.getIdCliente(), dto.getIdEstudio());
+        validar(dto.getFolio(), dto.getFechaHoraGeneracion(), dto.getIdCliente(), dto.getIdEstudio());
         if (!(dto.getIdDoctor() > 0) || dto.getIdDoctor() == null) {
             dto.setIdDoctor(null);
         }
@@ -58,7 +66,7 @@ public class SolicitudNegocio implements ISolicitudNegocio{
         if (dto == null || dto.getId() == null) {
             throw new NegocioException("Falta el id de la solicitud a actualizar.");
         }
-        validar(dto.getFolio(),dto.getFechaHoraGeneracion() , dto.getIdCliente(), dto.getIdEstudio());
+        validar(dto.getFolio(), dto.getFechaHoraGeneracion(), dto.getIdCliente(), dto.getIdEstudio());
         if (!(dto.getIdDoctor() > 0) || dto.getIdDoctor() == null) {
             dto.setIdDoctor(null);
         }
@@ -68,7 +76,7 @@ public class SolicitudNegocio implements ISolicitudNegocio{
             if (buscada == null) {
                 throw new NegocioException("La solicitud que intentas actualizar no existe.");
             }
-            if(buscada.getResultados().size() != 0){
+            if (buscada.getResultados().size() != 0) {
                 throw new NegocioException("No se puede modificar una solicitud con resultados registrados.");
             }
             SolicitudEntidad entidad = DTOAEntidad(dto);
@@ -89,7 +97,7 @@ public class SolicitudNegocio implements ISolicitudNegocio{
         }
         try {
             SolicitudEntidad entidad = solicitudDAO.buscarPorId(id);
-            if(entidad.getResultados().size() != 0){
+            if (entidad.getResultados().size() != 0) {
                 throw new NegocioException("No se puede cancelar una solicitud con resultados registrados.");
             }
             entidad.setCancelada(true);
@@ -130,12 +138,12 @@ public class SolicitudNegocio implements ISolicitudNegocio{
             throw new NegocioException("No se pudo obtener la lista de solicitudes.", e);
         }
     }
-    
+
     public List<SolicitudDTO> obtenerTodosActivos() throws NegocioException {
         try {
             List<SolicitudDTO> lista = new ArrayList<>();
             for (SolicitudEntidad e : solicitudDAO.obtenerTodos()) {
-                if(e.getCancelada() == false){
+                if (e.getCancelada() == false) {
                     lista.add(EntidadADTO(e));
                 }
             }
@@ -144,12 +152,12 @@ public class SolicitudNegocio implements ISolicitudNegocio{
             throw new NegocioException("No se pudo obtener la lista de solicitudes activas.", e);
         }
     }
-    
+
     public List<SolicitudDTO> obtenerTodosPendientes() throws NegocioException {
         try {
             List<SolicitudDTO> lista = new ArrayList<>();
             for (SolicitudEntidad e : solicitudDAO.obtenerTodos()) {
-                if(e.getResultados().size() == 0){
+                if (e.getResultados().size() == 0) {
                     lista.add(EntidadADTO(e));
                 }
             }
@@ -158,7 +166,7 @@ public class SolicitudNegocio implements ISolicitudNegocio{
             throw new NegocioException("No se pudo obtener la lista de solicitudes pendientes de resultados.", e);
         }
     }
-    
+
     private void validar(String folio, String fechaHoraGeneracion, Integer idCliente, Integer idEstudio) throws NegocioException {
         if (!val.validarTexto(folio)) {
             throw new NegocioException("El folio es invalido.");
@@ -173,7 +181,7 @@ public class SolicitudNegocio implements ISolicitudNegocio{
             throw new NegocioException("El id estudio es invalido.");
         }
     }
-    
+
     private SolicitudDTO EntidadADTO(SolicitudEntidad e) {
         return new SolicitudDTO(
                 e.getId(),
@@ -206,5 +214,5 @@ public class SolicitudNegocio implements ISolicitudNegocio{
                 doctorDAO.buscarPorId(dto.getIdDoctor()),
                 estudioDAO.buscarPorId(dto.getIdEstudio()));
     }
-    
+
 }

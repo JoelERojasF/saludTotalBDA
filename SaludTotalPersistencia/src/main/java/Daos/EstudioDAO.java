@@ -7,16 +7,19 @@ package Daos;
 import Conexion.IConexionBD;
 import Daos.Interfaces.IEstudioDAO;
 import Entidades.EstudioEntidad;
+import Entidades.ParametroEntidad;
+import Entidades.RangoEntidad;
 import exception.PersistenciaException;
 import jakarta.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author le0jx
  */
-public class EstudioDAO implements IEstudioDAO{
-    
+public class EstudioDAO implements IEstudioDAO {
+
     private final IConexionBD conexion;
 
     public EstudioDAO(IConexionBD conexion) {
@@ -35,6 +38,40 @@ public class EstudioDAO implements IEstudioDAO{
         } catch (Exception e) {
             revertir(em);
             throw new PersistenciaException("No se pudo guardar el estudio en la base de datos.", e);
+        } finally {
+            cerrar(em);
+        }
+    }
+
+    @Override
+    public EstudioEntidad guardarCompleto(EstudioEntidad estudio, List<ParametroEntidad> parametros) throws PersistenciaException {
+        EntityManager em = null;
+        try {
+            em = conexion.crearConexion();
+            em.getTransaction().begin();
+
+            estudio.setParametros(new ArrayList<>());
+            em.persist(estudio);
+            for (ParametroEntidad parametro : parametros) {
+                parametro.setEstudio(estudio);
+                estudio.getParametros().add(parametro);
+                if (parametro.getRangos() != null) {
+                    for (RangoEntidad rango : parametro.getRangos()) {
+                        rango.setParametro(parametro);
+                    }
+                }
+                em.persist(parametro);
+                if (parametro.getRangos() != null) {
+                    for (RangoEntidad rango : parametro.getRangos()) {
+                        em.persist(rango);
+                    }
+                }
+            }
+            em.getTransaction().commit();
+            return estudio;
+        } catch (Exception e) {
+            revertir(em);
+            throw new PersistenciaException("No se pudo guardar el estudio con sus parametros en la base de datos.", e);
         } finally {
             cerrar(em);
         }
@@ -94,7 +131,10 @@ public class EstudioDAO implements IEstudioDAO{
         EntityManager em = null;
         try {
             em = conexion.crearConexion();
-            return em.createQuery("SELECT e FROM EstudioEntidad e", EstudioEntidad.class)
+            return em.createQuery(
+                    "SELECT DISTINCT e FROM EstudioEntidad e "
+                    + "LEFT JOIN FETCH e.parametros "
+                    + "JOIN FETCH e.tipoMuestra", EstudioEntidad.class)
                     .getResultList();
         } catch (Exception e) {
             throw new PersistenciaException("No se pudo consultar la lista de estudios.", e);
@@ -102,8 +142,7 @@ public class EstudioDAO implements IEstudioDAO{
             cerrar(em);
         }
     }
-    
-    
+
     private void revertir(EntityManager em) {
         if (em != null && em.getTransaction().isActive()) {
             em.getTransaction().rollback();

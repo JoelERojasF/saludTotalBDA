@@ -4,6 +4,9 @@
  */
 package DTO.Crear;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author le0jx
@@ -13,6 +16,8 @@ public class CrearEstudioDTO {
     private String nombre;
     private String descripcion;
     private Integer idTipoMuestra;
+
+    private List<CrearParametroDTO> parametros = new ArrayList<>();
 
     public CrearEstudioDTO(String nombre, String descripcion, Integer idTipoMuestra) {
         this.nombre = nombre;
@@ -44,9 +49,17 @@ public class CrearEstudioDTO {
         this.idTipoMuestra = idTipoMuestra;
     }
 
+    public List<CrearParametroDTO> getParametros() {
+        return parametros;
+    }
+
+    public void setParametros(List<CrearParametroDTO> parametros) {
+        this.parametros = parametros;
+    }
+
     @Override
     public String toString() {
-        return "CrearEstudioDTO{" + "nombre=" + nombre + ", descripcion=" + descripcion + ", idTipoMuestra=" + idTipoMuestra + '}';
+        return "CrearEstudioDTO{" + "nombre=" + nombre + ", descripcion=" + descripcion + ", idTipoMuestra=" + idTipoMuestra + ", parametros=" + parametros + '}';
     }
     
     

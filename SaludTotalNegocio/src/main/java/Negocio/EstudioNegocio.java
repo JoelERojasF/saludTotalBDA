@@ -6,11 +6,17 @@ package Negocio;
 
 import Conexion.ConexionBD;
 import DTO.Crear.CrearEstudioDTO;
+import DTO.Crear.CrearParametroDTO;
+import DTO.Crear.CrearRangoDTO;
 import DTO.EstudioDTO;
 import Daos.EstudioDAO;
 import Daos.Interfaces.IEstudioDAO;
 import Daos.Interfaces.ITipoMuestraDAO;
+import Daos.TipoMuestraDAO;
 import Entidades.EstudioEntidad;
+import Entidades.ParametroEntidad;
+import Entidades.RangoEntidad;
+import Entidades.TipoMuestraEntidad;
 import Exception.NegocioException;
 import Negocio.Interfaces.IEstudioNegocio;
 import Validador.Validador;
@@ -22,14 +28,16 @@ import java.util.List;
  *
  * @author le0jx
  */
-public class EstudioNegocio implements IEstudioNegocio{
-    
+public class EstudioNegocio implements IEstudioNegocio {
+
     private final IEstudioDAO estudioDAO;
     private ITipoMuestraDAO tipoMuestraDAO;
     Validador val = new Validador();
 
     public EstudioNegocio() {
-        this.estudioDAO = new EstudioDAO(new ConexionBD());
+        ConexionBD conexion = new ConexionBD();
+        this.estudioDAO = new EstudioDAO(conexion);
+        this.tipoMuestraDAO = new TipoMuestraDAO(conexion);
     }
 
     @Override
@@ -44,6 +52,44 @@ public class EstudioNegocio implements IEstudioNegocio{
             return EntidadADTO(estudioDAO.guardar(entidad));
         } catch (PersistenciaException e) {
             throw new NegocioException("No se pudo registrar el estudio. Revisa la conexion con la base de datos.", e);
+        }
+    }
+
+    @Override
+    public EstudioDTO registrarCompleto(CrearEstudioDTO dto) throws NegocioException {
+        if (dto == null) {
+            throw new NegocioException("No se recibieron los datos del estudio.");
+        }
+        if (dto.getIdTipoMuestra() == null) {
+            throw new NegocioException("Falta el tipo de muestra del estudio.");
+        }
+        validar(dto.getNombre(), dto.getDescripcion(), dto.getIdTipoMuestra());
+
+        List<CrearParametroDTO> parametros = dto.getParametros();
+        if (parametros == null || parametros.isEmpty()) {
+            throw new NegocioException("El estudio debe tener al menos un parametro.");
+        }
+        validarParametros(parametros);
+
+        try {
+            TipoMuestraEntidad tipoMuestra = tipoMuestraDAO.buscarPorId(dto.getIdTipoMuestra());
+            if (tipoMuestra == null) {
+                throw new NegocioException("El tipo de muestra seleccionado no existe.");
+            }
+
+            EstudioEntidad estudio = new EstudioEntidad(
+                    dto.getNombre().trim(),
+                    dto.getDescripcion().trim(),
+                    tipoMuestra);
+
+            List<ParametroEntidad> entidadesParametro = new ArrayList<>();
+            for (CrearParametroDTO p : parametros) {
+                entidadesParametro.add(parametroAEntidad(p));
+            }
+
+            return EntidadADTO(estudioDAO.guardarCompleto(estudio, entidadesParametro));
+        } catch (PersistenciaException e) {
+            throw new NegocioException("No se pudo registrar el estudio con sus parametros. No se guardo nada.", e);
         }
     }
 
@@ -113,9 +159,9 @@ public class EstudioNegocio implements IEstudioNegocio{
             return lista;
         } catch (PersistenciaException e) {
             throw new NegocioException("No se pudo obtener la lista de estudios.", e);
-        }    
+        }
     }
-    
+
     private void validar(String nombre, String descripcion, Integer idTipoMuestra) throws NegocioException {
         if (!val.validarNombrePersona(nombre)) {
             throw new NegocioException("El nombre es invalido.");
@@ -127,13 +173,110 @@ public class EstudioNegocio implements IEstudioNegocio{
             throw new NegocioException("El id del tipo de muestra es invalido.");
         }
     }
-    
+
+    private void validarParametros(List<CrearParametroDTO> parametros) throws NegocioException {
+        for (CrearParametroDTO p : parametros) {
+            if (p == null) {
+                throw new NegocioException("Hay un parametro sin datos.");
+            }
+            if (!val.validarTexto(p.getNombre())) {
+                throw new NegocioException("El nombre del parametro es invalido.");
+            }
+            if (!val.validarTexto(p.getDescripcion())) {
+                throw new NegocioException("La descripcion del parametro '" + p.getNombre() + "' es invalida.");
+            }
+            if (p.getOrdenAparicion() == null || p.getOrdenAparicion() <= 0) {
+                throw new NegocioException("El orden de aparicion del parametro '" + p.getNombre() + "' es invalido.");
+            }
+            if (Boolean.TRUE.equals(p.getNumerico())) {
+                if (p.getRangos() == null || p.getRangos().isEmpty()) {
+                    throw new NegocioException("El parametro '" + p.getNombre() + "' necesita al menos un rango.");
+                }
+                for (CrearRangoDTO r : p.getRangos()) {
+                    validarRango(p.getNombre(), r);
+                }
+            }
+        }
+    }
+
+    private void validarRango(String parametro, CrearRangoDTO r) throws NegocioException {
+        if (r == null) {
+            throw new NegocioException("El parametro '" + parametro + "' tiene un rango sin datos.");
+        }
+        if (!val.validarTexto(r.getUnidadMedida())) {
+            throw new NegocioException("La unidad de medida del parametro '" + parametro + "' es invalida.");
+        }
+        if (r.getInicio() == null || r.getFin() == null || r.getInicio() < 0 || r.getFin() < 0) {
+            throw new NegocioException("Los valores del rango de '" + parametro + "' son invalidos.");
+        }
+        if (r.getInicio() > r.getFin()) {
+            throw new NegocioException("El inicio del rango de '" + parametro + "' no puede ser mayor que el fin.");
+        }
+        if (r.getEdadInicio() == null || r.getEdadFin() == null || r.getEdadInicio() < 0 || r.getEdadFin() < 0) {
+            throw new NegocioException("Las edades del rango de '" + parametro + "' son invalidas.");
+        }
+        if (r.getEdadInicio() > r.getEdadFin()) {
+            throw new NegocioException("La edad de inicio del rango de '" + parametro + "' no puede ser mayor que la de fin.");
+        }
+
+    }
+
+    /**
+     * El estudio se asigna despues, dentro de la transaccion del DAO.
+     */
+    private ParametroEntidad parametroAEntidad(CrearParametroDTO p) {
+        boolean numerico = Boolean.TRUE.equals(p.getNumerico());
+
+        Float valorInicial = null;
+        Float valorFinal = null;
+        if (numerico) {
+            if (val.validarNumeroDecimal(p.getValorInicial())) {
+                valorInicial = Float.parseFloat(p.getValorInicial().trim());
+            }
+            if (val.validarNumeroDecimal(p.getValorFinal())) {
+                valorFinal = Float.parseFloat(p.getValorFinal().trim());
+            }
+        }
+
+        ParametroEntidad entidad = new ParametroEntidad(
+                p.getNombre().trim(),
+                p.getDescripcion().trim(),
+                p.getOrdenAparicion(),
+                valorInicial,
+                valorFinal,
+                numerico,
+                null);
+
+        List<RangoEntidad> rangos = new ArrayList<>();
+        if (numerico) {
+            for (CrearRangoDTO r : p.getRangos()) {
+                rangos.add(new RangoEntidad(
+                        r.getUnidadMedida().trim(),
+                        r.getInicio(),
+                        r.getFin(),
+                        r.getEdadInicio(),
+                        r.getEdadFin(),
+                        null));
+            }
+        }
+        entidad.setRangos(rangos);
+        return entidad;
+    }
+
     private EstudioDTO EntidadADTO(EstudioEntidad e) {
-        return new EstudioDTO(
+        EstudioDTO dto = new EstudioDTO(
                 e.getId(),
                 e.getNombre(),
                 e.getDescripcion(),
                 e.getTipoMuestra().getId());
+        dto.setNombreTipoMuestra(e.getTipoMuestra().getNombre());
+
+        if (e.getParametros() != null) {
+            e.getParametros().stream()
+                    .sorted(java.util.Comparator.comparing(ParametroEntidad::getOrdenAparicion))
+                    .forEach(p -> dto.getNombresParametros().add(p.getNombre()));
+        }
+        return dto;
     }
 
     private EstudioEntidad DTOAEntidad(EstudioDTO dto) throws PersistenciaException {

@@ -13,8 +13,8 @@ import javax.swing.SwingUtilities;
 public class SaludTotalPresentacion {
 
     public static void main(String[] args) {
-        //SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
-        SwingUtilities.invokeLater(() -> new EstudiosFrame(null).setVisible(true));
+        SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
+       //SwingUtilities.invokeLater(() -> new EstudiosFrame(null).setVisible(true));
 
     }
 }

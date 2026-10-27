@@ -1,10 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
 package Daos.Interfaces;
 
 import Entidades.EstudioEntidad;
+import Entidades.ParametroEntidad;
 import exception.PersistenciaException;
 import java.util.List;
 
@@ -14,6 +11,8 @@ import java.util.List;
  */
 public interface IEstudioDAO {
     EstudioEntidad guardar(EstudioEntidad estudio) throws PersistenciaException;
+
+    EstudioEntidad guardarCompleto(EstudioEntidad estudio, List<ParametroEntidad> parametros) throws PersistenciaException;
 
     EstudioEntidad actualizar(EstudioEntidad estudio) throws PersistenciaException;
 

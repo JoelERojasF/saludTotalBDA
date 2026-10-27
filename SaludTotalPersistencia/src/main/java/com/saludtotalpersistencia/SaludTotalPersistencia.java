@@ -7,14 +7,17 @@ import Conexion.ConexionBD;
 import Conexion.IConexionBD;
 import Daos.ClienteDAO;
 import Daos.DoctorDAO;
+import Daos.EstudioDAO;
+import Daos.ParametroDAO;
+import Daos.TipoMuestraDAO;
 import Entidades.ClienteEntidad;
 import Entidades.DoctorEntidad;
-import Entidades.UsuarioEntidad;
+import Entidades.EstudioEntidad;
+import Entidades.ParametroEntidad;
+import Entidades.TipoMuestraEntidad;
 import exception.PersistenciaException;
-import jakarta.persistence.EntityManager;
 import java.sql.Date;
 import java.sql.SQLException;
-import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -35,6 +38,14 @@ public class SaludTotalPersistencia {
         DoctorEntidad d1 = new DoctorEntidad("Arturo", "Zamora", "Fuentes", "Masculino");
         DoctorEntidad d2 = new DoctorEntidad("Alejandra", "Paredes", "León", "Femenino");
 
+        //Estudio , muestras 
+        EstudioDAO eDAO = new EstudioDAO(conexion);
+        TipoMuestraDAO tDAO = new TipoMuestraDAO(conexion);
+        TipoMuestraEntidad t1 = new TipoMuestraEntidad("sangre");
+        EstudioEntidad e1 = new EstudioEntidad("estudio", "descripcion", t1);
+        tDAO.guardar(t1);
+        eDAO.guardar(e1);
+ 
         dDao.guardar(d1);
         dDao.guardar(d2);
 

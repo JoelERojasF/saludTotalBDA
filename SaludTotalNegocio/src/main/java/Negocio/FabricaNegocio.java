@@ -6,10 +6,10 @@ package Negocio;
 
 import Conexion.ConexionBD;
 import Conexion.IConexionBD;
-import Daos.ClienteDAO;
-import Daos.DoctorDAO;
 import Negocio.Interfaces.IClienteNegocio;
 import Negocio.Interfaces.IDoctorNegocio;
+import Negocio.Interfaces.IEstudioNegocio;
+import Negocio.Interfaces.ITipoMuestraNegocio;
 
 /**
  *
@@ -29,5 +29,12 @@ public class FabricaNegocio {
     public static IDoctorNegocio crearDoctorNegocio() {
         return new DoctorNegocio();
     }
-    
+
+    public static IEstudioNegocio crearEstudioNegocio() {
+        return new EstudioNegocio();
+    }
+
+    public static ITipoMuestraNegocio crearTipoMuestraNegocio() {
+        return new TipoMuestraNegocio();
+    }
 }

@@ -10,7 +10,9 @@ import DTO.ResultadoDTO;
 import Daos.Interfaces.IParametroDAO;
 import Daos.Interfaces.IResultadoDAO;
 import Daos.Interfaces.ISolicitudDAO;
+import Daos.ParametroDAO;
 import Daos.ResultadoDAO;
+import Daos.SolicitudDAO;
 import Entidades.ResultadoEntidad;
 import Exception.NegocioException;
 import Negocio.Interfaces.IResultadoNegocio;
@@ -29,9 +31,12 @@ public class ResultadoNegocio implements IResultadoNegocio{
     private ISolicitudDAO solicitudDAO;
     Validador val = new Validador();
 
-    public ResultadoNegocio() {
-        this.resultadoDAO = new ResultadoDAO(new ConexionBD());
-    }     
+ public ResultadoNegocio() {
+        ConexionBD conexion = new ConexionBD();
+        this.resultadoDAO = new ResultadoDAO(conexion);
+        this.parametroDAO = new ParametroDAO(conexion);
+        this.solicitudDAO = new SolicitudDAO(conexion);
+    }   
             
     @Override
     public ResultadoDTO registrar(CrearResultadoDTO dto) throws NegocioException {

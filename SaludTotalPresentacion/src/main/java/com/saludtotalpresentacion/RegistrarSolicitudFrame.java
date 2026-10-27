@@ -5,13 +5,20 @@ package com.saludtotalpresentacion;
 
 import DTO.ClienteDTO;
 import DTO.DoctorDTO;
+import DTO.EstudioDTO;
 import DTO.UsuarioDTO;
+import DTO.Crear.CrearSolicitudDTO;
 import Exception.NegocioException;
 import Negocio.FabricaNegocio;
 import Negocio.Interfaces.IClienteNegocio;
 import Negocio.Interfaces.IDoctorNegocio;
+import Negocio.Interfaces.IEstudioNegocio;
+import Negocio.Interfaces.ISolicitudNegocio;
+import Negocio.SolicitudNegocio;
+import com.saludtotalpresentacion.LoginFrame.CampoTexto;
 import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
 import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -22,8 +29,11 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -37,6 +47,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -49,15 +61,21 @@ public class RegistrarSolicitudFrame extends JFrame {
 
     private final IClienteNegocio clienteNegocio;
     private final IDoctorNegocio doctorNegocio;
+    private final IEstudioNegocio estudioNegocio;
+    private final ISolicitudNegocio solicitudNegocio;
 
     private List<ClienteDTO> listaClientes = new ArrayList<>();
     private List<DoctorDTO> listaDoctores = new ArrayList<>();
+
+    private List<EstudioDTO> listaEstudios = new ArrayList<>();
+    private List<EstudioDTO> estudiosVisibles = new ArrayList<>();
 
     private final Color COLOR_BOTON = new Color(51, 51, 51);
     private final Font FUENTE_TITULO = new Font("Segoe UI", Font.BOLD, 22);
 
     private DefaultTableModel modeloAnalisis;
 
+    private CampoTexto txtBuscarEstudio;
     private JComboBox<String> cmbCliente;
     private JComboBox<String> cmbDoctor;
     private JLabel lblInfoCliente;
@@ -69,6 +87,8 @@ public class RegistrarSolicitudFrame extends JFrame {
         this.usuarioActual = usuario;
         this.clienteNegocio = FabricaNegocio.crearClienteNegocio();
         this.doctorNegocio = FabricaNegocio.crearDoctorNegocio();
+        this.estudioNegocio = FabricaNegocio.crearEstudioNegocio();
+        this.solicitudNegocio = new SolicitudNegocio();
 
         setTitle("Salud Total - Registrar Solicitud");
         setSize(900, 820);
@@ -99,6 +119,7 @@ public class RegistrarSolicitudFrame extends JFrame {
         try {
             listaClientes = clienteNegocio.obtenerTodos();
             listaDoctores = doctorNegocio.obtenerTodos();
+            listaEstudios = estudioNegocio.obtenerTodos();
 
             cmbCliente.removeAllItems();
             cmbCliente.addItem("Seleccionar cliente...");
@@ -112,9 +133,28 @@ public class RegistrarSolicitudFrame extends JFrame {
                 cmbDoctor.addItem("DR. " + nombreCompletoDoctor(doctor));
             }
 
+            filtrarEstudios();
+
         } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "No se pudieron cargar los datos", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void filtrarEstudios() {
+        String textoBuscado = txtBuscarEstudio.getText().trim().toLowerCase();
+        if (textoBuscado.equals("buscar estudio...")) {
+            textoBuscado = "";
+        }
+
+        estudiosVisibles.clear();
+        modeloAnalisis.setRowCount(0);
+
+        for (EstudioDTO estudio : listaEstudios) {
+            if (estudio.getNombre().toLowerCase().contains(textoBuscado)) {
+                estudiosVisibles.add(estudio);
+                modeloAnalisis.addRow(new Object[]{false, estudio.getNombre() + " - " + estudio.getNombreTipoMuestra()});
+            }
         }
     }
 
@@ -146,10 +186,31 @@ public class RegistrarSolicitudFrame extends JFrame {
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
 
-        panel.add(crearBotonOscuro("Estudios"));
-        panel.add(crearBotonOscuro("Solicitudes"));
-        panel.add(crearBotonOscuro("Resultado"));
-        panel.add(crearBotonOscuro("Reportes"));
+        JButton btnEstudios = crearBotonOscuro("Estudios");
+        btnEstudios.addActionListener(e -> {
+            new EstudiosFrame(usuarioActual).setVisible(true);
+            this.dispose();
+        });
+
+        JButton btnSolicitudes = crearBotonOscuro("Solicitudes");
+        btnSolicitudes.addActionListener(e -> {
+            new SolicitudesFrame(usuarioActual).setVisible(true);
+            this.dispose();
+        });
+
+        JButton btnResultado = crearBotonOscuro("Resultado");
+        btnResultado.addActionListener(e -> {
+            new ResultadosFrame(usuarioActual).setVisible(true);
+            this.dispose();
+        });
+
+        JButton btnReportes = crearBotonOscuro("Reportes");
+        // ReportesFrame.addActionListener
+
+        panel.add(btnEstudios);
+        panel.add(btnSolicitudes);
+        panel.add(btnResultado);
+        panel.add(btnReportes);
 
         return panel;
     }
@@ -180,7 +241,6 @@ public class RegistrarSolicitudFrame extends JFrame {
         pnlBusquedas.setPreferredSize(new Dimension(0, 200));
         pnlBusquedas.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
 
-        // Columna Cliente
         JPanel pnlCliente = new JPanel();
         pnlCliente.setLayout(new BoxLayout(pnlCliente, BoxLayout.Y_AXIS));
         pnlCliente.setBackground(COLOR_FONDO);
@@ -198,19 +258,10 @@ public class RegistrarSolicitudFrame extends JFrame {
             int index = cmbCliente.getSelectedIndex();
             if (index > 0 && index - 1 < listaClientes.size()) {
                 ClienteDTO clienteSeleccionado = listaClientes.get(index - 1);
-                String sexoVal = "";
-                if (clienteSeleccionado.getSexo() != null) {
-                    sexoVal = clienteSeleccionado.getSexo();
-                }
-                String fechaVal = "";
-                if (clienteSeleccionado.getFechaNacimiento() != null) {
-                    fechaVal = clienteSeleccionado.getFechaNacimiento();
-                }
-                String sangreVal = "";
-                if (clienteSeleccionado.getTipoSangre() != null) {
-                    sangreVal = clienteSeleccionado.getTipoSangre();
-                }
-                
+                String sexoVal = clienteSeleccionado.getSexo() != null ? clienteSeleccionado.getSexo() : "";
+                String fechaVal = clienteSeleccionado.getFechaNacimiento() != null ? clienteSeleccionado.getFechaNacimiento() : "";
+                String sangreVal = clienteSeleccionado.getTipoSangre() != null ? clienteSeleccionado.getTipoSangre() : "";
+
                 lblInfoCliente.setText("<html>nombre completo: " + nombreCompletoCliente(clienteSeleccionado)
                         + "<br>sexo: " + sexoVal
                         + "<br>fecha de nacimiento: " + fechaVal
@@ -226,16 +277,20 @@ public class RegistrarSolicitudFrame extends JFrame {
 
         JButton btnRegistrarCliente = crearBotonOscuro("Registrar cliente");
         btnRegistrarCliente.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         btnRegistrarCliente.addActionListener(e -> {
             RegistrarClienteFrame ventanaCliente = new RegistrarClienteFrame(usuarioActual);
-            // Cuando la ventana de cliente se cierre, recargamos los datos para que aparezca el nuevo cliente
+            this.setEnabled(false);
+
             ventanaCliente.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     cargarDatosNegocio();
+                    RegistrarSolicitudFrame.this.setEnabled(true);
+                    RegistrarSolicitudFrame.this.toFront();
                 }
             });
+
             ventanaCliente.setVisible(true);
         });
 
@@ -247,7 +302,6 @@ public class RegistrarSolicitudFrame extends JFrame {
         pnlCliente.add(Box.createVerticalStrut(8));
         pnlCliente.add(btnRegistrarCliente);
 
-        // Columna Doctor
         JPanel pnlDoctor = new JPanel();
         pnlDoctor.setLayout(new BoxLayout(pnlDoctor, BoxLayout.Y_AXIS));
         pnlDoctor.setBackground(COLOR_FONDO);
@@ -286,11 +340,7 @@ public class RegistrarSolicitudFrame extends JFrame {
             int index = cmbDoctor.getSelectedIndex();
             if (index > 0 && index - 1 < listaDoctores.size()) {
                 DoctorDTO doctorSeleccionado = listaDoctores.get(index - 1);
-                String sexoVal = "";
-                if (doctorSeleccionado.getSexo() != null) {
-                    sexoVal = doctorSeleccionado.getSexo();
-                }
-                
+                String sexoVal = doctorSeleccionado.getSexo() != null ? doctorSeleccionado.getSexo() : "";
                 lblInfoDoctor.setText("<html>nombre completo: DR. " + nombreCompletoDoctor(doctorSeleccionado)
                         + "<br>sexo: " + sexoVal + "</html>");
             } else {
@@ -338,9 +388,28 @@ public class RegistrarSolicitudFrame extends JFrame {
     }
 
     private JPanel crearTablaAnalisis() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout(0, 10));
         panel.setBackground(COLOR_FONDO);
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        txtBuscarEstudio = new CampoTexto("Buscar estudio...");
+        txtBuscarEstudio.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrarEstudios();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrarEstudios();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filtrarEstudios();
+            }
+        });
+        panel.add(txtBuscarEstudio, BorderLayout.NORTH);
 
         modeloAnalisis = new DefaultTableModel(new Object[]{"Sel", "Análisis solicitados"}, 0) {
             @Override
@@ -361,7 +430,7 @@ public class RegistrarSolicitudFrame extends JFrame {
         JTable tabla = new JTable(modeloAnalisis);
         tabla.setRowHeight(25);
         tabla.setShowGrid(false);
-        tabla.setTableHeader(null); 
+        tabla.setTableHeader(null);
         tabla.getColumnModel().getColumn(0).setMaxWidth(40);
 
         JScrollPane scroll = new JScrollPane(tabla);
@@ -389,10 +458,71 @@ public class RegistrarSolicitudFrame extends JFrame {
         JButton btnRegistrarSolicitud = crearBotonOscuro("Registrar solicitud");
         btnRegistrarSolicitud.setPreferredSize(new Dimension(160, 40));
 
+        btnRegistrarSolicitud.addActionListener(e -> guardarSolicitud());
+
         panel.add(btnCancelar);
         panel.add(btnRegistrarSolicitud);
 
         return panel;
+    }
+
+    private void guardarSolicitud() {
+        int clienteIdx = cmbCliente.getSelectedIndex();
+        if (clienteIdx <= 0) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un cliente.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Integer idDoctor = null;
+        if (rbDoctorSolicita.isSelected()) {
+            int doctorIdx = cmbDoctor.getSelectedIndex();
+            if (doctorIdx <= 0) {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un doctor o marcar 'Por cuenta propia'.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            idDoctor = listaDoctores.get(doctorIdx - 1).getId();
+        }
+
+        List<EstudioDTO> estudiosSeleccionados = new ArrayList<>();
+        for (int i = 0; i < modeloAnalisis.getRowCount(); i++) {
+            Boolean seleccionado = (Boolean) modeloAnalisis.getValueAt(i, 0);
+            if (seleccionado != null && seleccionado) {
+                estudiosSeleccionados.add(estudiosVisibles.get(i));
+            }
+        }
+
+        if (estudiosSeleccionados.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar al menos un análisis de la lista.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        ClienteDTO clienteSeleccionado = listaClientes.get(clienteIdx - 1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String fechaHoraActual = sdf.format(new Date());
+
+        try {
+            for (EstudioDTO estudio : estudiosSeleccionados) {
+                String folioGenerado = "LAB-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
+                CrearSolicitudDTO dto = new CrearSolicitudDTO(
+                        folioGenerado,
+                        fechaHoraActual,
+                        clienteSeleccionado.getId(),
+                        idDoctor,
+                        estudio.getId()
+                );
+
+                solicitudNegocio.registrar(dto);
+            }
+
+            JOptionPane.showMessageDialog(this, "Solicitud(es) registrada(s) con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+            new SolicitudesFrame(usuarioActual).setVisible(true);
+            this.dispose();
+
+        } catch (NegocioException ex) {
+            JOptionPane.showMessageDialog(this, "Ocurrió un error: " + ex.getMessage(), "Error al Registrar", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private JButton crearBotonOscuro(String texto) {

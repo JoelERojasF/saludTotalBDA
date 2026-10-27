@@ -5,13 +5,20 @@ package com.saludtotalpresentacion;
 
 import DTO.ClienteDTO;
 import DTO.DoctorDTO;
+import DTO.EstudioDTO;
+import DTO.SolicitudDTO;
 import DTO.UsuarioDTO;
 import Exception.NegocioException;
 import Negocio.FabricaNegocio;
 import Negocio.Interfaces.IClienteNegocio;
 import Negocio.Interfaces.IDoctorNegocio;
+import Negocio.Interfaces.IEstudioNegocio;
+import Negocio.Interfaces.ISolicitudNegocio;
+import Negocio.SolicitudNegocio;
+import com.saludtotalpresentacion.LoginFrame.CampoTexto;
 import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
 import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -32,8 +39,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -48,9 +56,15 @@ public class SolicitudesFrame extends JFrame {
 
     private final IClienteNegocio clienteNegocio;
     private final IDoctorNegocio doctorNegocio;
+    private final IEstudioNegocio estudioNegocio;
+    private final ISolicitudNegocio solicitudNegocio;
 
     private List<ClienteDTO> listaClientes = new ArrayList<>();
     private List<DoctorDTO> listaDoctores = new ArrayList<>();
+    private List<EstudioDTO> listaEstudios = new ArrayList<>();
+
+    private final List<Object[]> todasLasFilas = new ArrayList<>();
+    private final List<Object[]> filasVisibles = new ArrayList<>();
 
     private final Color COLOR_BOTON = new Color(51, 51, 51);
     private final Font FUENTE_TITULO = new Font("Segoe UI", Font.BOLD, 22);
@@ -58,12 +72,17 @@ public class SolicitudesFrame extends JFrame {
     private DefaultTableModel modeloTabla;
     private DefaultTableModel modeloDetalles;
 
+    private CampoTexto txtBuscar;
+
     private boolean ajustandoSeleccion = false;
 
     public SolicitudesFrame(UsuarioDTO usuario) {
         this.usuarioActual = usuario;
+
         this.clienteNegocio = FabricaNegocio.crearClienteNegocio();
         this.doctorNegocio = FabricaNegocio.crearDoctorNegocio();
+        this.estudioNegocio = FabricaNegocio.crearEstudioNegocio();
+        this.solicitudNegocio = new SolicitudNegocio();
 
         setTitle("Salud Total - Solicitudes");
         setSize(900, 780);
@@ -112,103 +131,145 @@ public class SolicitudesFrame extends JFrame {
     }
 
     private void cargarDatos() {
-        modeloTabla.setRowCount(0);
-        modeloDetalles.setRowCount(0);
         try {
             listaClientes = clienteNegocio.obtenerTodos();
             listaDoctores = doctorNegocio.obtenerTodos();
+            listaEstudios = estudioNegocio.obtenerTodos();
 
-            int limite = Math.max(listaClientes.size(), listaDoctores.size());
+            List<SolicitudDTO> listaSolicitudes = solicitudNegocio.obtenerTodos();
 
-            for (int i = 0; i < limite; i++) {
-                String nombrePaciente = "";
-                if (i < listaClientes.size()) {
-                    nombrePaciente = nombreCompleto(listaClientes.get(i));
-                }
+            todasLasFilas.clear();
 
-                String nombreDoctor = "";
-                if (i < listaDoctores.size()) {
-                    nombreDoctor = "DR. " + nombreCompletoDoctor(listaDoctores.get(i));
-                }
+            for (SolicitudDTO sol : listaSolicitudes) {
+                ClienteDTO cli = getClientePorId(sol.getIdCliente());
+                DoctorDTO doc = getDoctorPorId(sol.getIdDoctor());
+                EstudioDTO est = getEstudioPorId(sol.getIdEstudio());
 
-                String vacio = "";
+                String nombreCliente = cli != null ? nombreCompletoCliente(cli) : "Desconocido";
+                String nombreDoctor = doc != null ? "DR. " + nombreCompletoDoctor(doc) : "N/A (Cuenta propia)";
+                String nombreEstudio = est != null ? est.getNombre() : "Desconocido";
+                String estado = sol.getCancelada() ? "Cancelada" : "Pendiente";
 
-                modeloTabla.addRow(new Object[]{
-                    false,
-                    nombrePaciente,
-                    vacio,
-                    nombreDoctor
-                });
+                Object[] filaData = new Object[]{
+                    sol, false, sol.getFolio(), nombreCliente, nombreEstudio, nombreDoctor, estado
+                };
+
+                todasLasFilas.add(filaData);
             }
+
+            filtrar();
+
         } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "No se pudieron cargar los registros", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void mostrarDetallesFila(int fila) {
+    private void filtrar() {
+        String textoBusqueda = txtBuscar.getText().trim().toLowerCase();
+
+        ajustandoSeleccion = true;
+        modeloTabla.setRowCount(0);
+        filasVisibles.clear();
         modeloDetalles.setRowCount(0);
 
-        if (fila < 0 || fila >= modeloTabla.getRowCount()) {
+        for (Object[] fila : todasLasFilas) {
+            String folio = fila[2].toString().toLowerCase();
+            String paciente = fila[3].toString().toLowerCase();
+
+            if (folio.contains(textoBusqueda) || paciente.contains(textoBusqueda)) {
+                filasVisibles.add(fila);
+                modeloTabla.addRow(new Object[]{
+                    fila[1], fila[2], fila[3], fila[4], fila[5], fila[6]
+                });
+            }
+        }
+        ajustandoSeleccion = false;
+    }
+
+    private void mostrarDetallesFila(int filaVisibleIndex) {
+        modeloDetalles.setRowCount(0);
+
+        if (filaVisibleIndex < 0 || filaVisibleIndex >= filasVisibles.size()) {
             return;
         }
 
-        ClienteDTO cliente = null;
-        if (fila < listaClientes.size()) {
-            cliente = listaClientes.get(fila);
-        }
+        Object[] filaData = filasVisibles.get(filaVisibleIndex);
+        SolicitudDTO solicitud = (SolicitudDTO) filaData[0];
 
-        DoctorDTO doctor = null;
-        if (fila < listaDoctores.size()) {
-            doctor = listaDoctores.get(fila);
-        }
+        ClienteDTO cliente = getClientePorId(solicitud.getIdCliente());
+        DoctorDTO doctor = getDoctorPorId(solicitud.getIdDoctor());
+        EstudioDTO estudio = getEstudioPorId(solicitud.getIdEstudio());
 
-        String textoPaciente = "";
+        String textoPaciente = "N/A";
         if (cliente != null) {
-            String sexo = "";
-            if (cliente.getSexo() != null) {
-                sexo = cliente.getSexo();
-            }
+            String sexo = cliente.getSexo() != null ? cliente.getSexo() : "N/A";
+            String fechaNac = cliente.getFechaNacimiento() != null ? cliente.getFechaNacimiento() : "N/A";
+            String sangre = cliente.getTipoSangre() != null ? cliente.getTipoSangre() : "N/A";
 
-            String fechaNacimiento = "";
-            if (cliente.getFechaNacimiento() != null) {
-                fechaNacimiento = cliente.getFechaNacimiento();
-            }
-
-            String tipoSangre = "";
-            if (cliente.getTipoSangre() != null) {
-                tipoSangre = cliente.getTipoSangre();
-            }
-
-            textoPaciente = nombreCompleto(cliente) + "\n\n"
+            textoPaciente = nombreCompletoCliente(cliente) + "\n\n"
                     + "Sexo: " + sexo + "\n\n"
-                    + "Fecha nacimiento:\n" + fechaNacimiento + "\n\n"
-                    + "Tipo Sangre: " + tipoSangre;
+                    + "Fecha nacimiento:\n" + fechaNac + "\n\n"
+                    + "Tipo Sangre: " + sangre;
         }
 
-        String textoDoctor = "";
+        String textoDoctor = "Por cuenta propia";
         if (doctor != null) {
-            String sexo = "";
-            if (doctor.getSexo() != null) {
-                sexo = doctor.getSexo();
-            }
-
-            textoDoctor = "DR. " + nombreCompletoDoctor(doctor) + "\n\n"
-                    + "Sexo: " + sexo;
+            String sexoDoc = doctor.getSexo() != null ? doctor.getSexo() : "N/A";
+            textoDoctor = "DR. " + nombreCompletoDoctor(doctor) + "\n\nSexo: " + sexoDoc;
         }
 
-        String solicitud = (String) modeloTabla.getValueAt(fila, 2);
-        String resultado = "";
+        String textoSolicitud = "Folio: " + solicitud.getFolio() + "\n\n"
+                + "Fecha:\n" + solicitud.getFechaHoraGeneracion() + "\n\n"
+                + "Estudio:\n" + (estudio != null ? estudio.getNombre() : "N/A");
+
+        String textoEstado = solicitud.getCancelada() ? "CANCELADA" : "PENDIENTE";
 
         modeloDetalles.addRow(new Object[]{
             textoPaciente,
             textoDoctor,
-            solicitud,
-            resultado
+            textoSolicitud,
+            textoEstado
         });
     }
 
-    private String nombreCompleto(ClienteDTO c) {
+    private ClienteDTO getClientePorId(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        for (ClienteDTO c : listaClientes) {
+            if (c.getId().equals(id)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    private DoctorDTO getDoctorPorId(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        for (DoctorDTO d : listaDoctores) {
+            if (d.getId().equals(id)) {
+                return d;
+            }
+        }
+        return null;
+    }
+
+    private EstudioDTO getEstudioPorId(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        for (EstudioDTO e : listaEstudios) {
+            if (e.getId().equals(id)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    private String nombreCompletoCliente(ClienteDTO c) {
         StringBuilder sb = new StringBuilder(c.getNombre());
         if (c.getApellidoPaterno() != null) {
             sb.append(" ").append(c.getApellidoPaterno());
@@ -235,10 +296,28 @@ public class SolicitudesFrame extends JFrame {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 0));
         panel.setBackground(COLOR_FONDO);
 
-        panel.add(crearBotonOscuro("Estudios"));
-        panel.add(crearBotonOscuro("Solicitudes"));
-        panel.add(crearBotonOscuro("Resultado"));
-        panel.add(crearBotonOscuro("Reportes"));
+        JButton btnEstudios = crearBotonOscuro("Estudios");
+        btnEstudios.addActionListener(e -> {
+            EstudiosFrame estudiosFrame = new EstudiosFrame(usuarioActual);
+            estudiosFrame.setVisible(true);
+            this.dispose();
+        });
+
+        JButton btnSolicitudes = crearBotonOscuro("Solicitudes"); 
+
+        JButton btnResultado = crearBotonOscuro("Resultado");
+        btnResultado.addActionListener(e -> {
+            ResultadosFrame resultadosFrame = new ResultadosFrame(usuarioActual);
+            resultadosFrame.setVisible(true);
+            this.dispose();
+        });
+
+        JButton btnReportes = crearBotonOscuro("Reportes");
+
+        panel.add(btnEstudios);
+        panel.add(btnSolicitudes);
+        panel.add(btnResultado);
+        panel.add(btnReportes);
 
         return panel;
     }
@@ -256,17 +335,29 @@ public class SolicitudesFrame extends JFrame {
         JPanel pnlBusqueda = new JPanel(new BorderLayout(15, 0));
         pnlBusqueda.setBackground(COLOR_FONDO);
         pnlBusqueda.setAlignmentX(Component.LEFT_ALIGNMENT);
-        pnlBusqueda.setMaximumSize(new Dimension(850, 40));
+        pnlBusqueda.setMaximumSize(new Dimension(850, 42));
 
-        JTextField txtBuscar = new JTextField();
-        txtBuscar.setForeground(Color.GRAY);
-        txtBuscar.setPreferredSize(new Dimension(450, 35));
+        txtBuscar = new CampoTexto("Buscar folio o paciente...");
+        txtBuscar.setPreferredSize(new Dimension(450, 42));
 
-        JButton btnBuscarFolio = new JButton("Buscar folio");
-        btnBuscarFolio.setPreferredSize(new Dimension(130, 35));
+        txtBuscar.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrar();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrar();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                filtrar();
+            }
+        });
 
         pnlBusqueda.add(txtBuscar, BorderLayout.CENTER);
-        pnlBusqueda.add(btnBuscarFolio, BorderLayout.EAST);
 
         panel.add(lblTitulo);
         panel.add(Box.createVerticalStrut(8));
@@ -280,7 +371,7 @@ public class SolicitudesFrame extends JFrame {
         panel.setBackground(COLOR_FONDO);
 
         modeloTabla = new DefaultTableModel(
-                new Object[]{"Sel", "Paciente", "Solicitud", "Doctor"}, 0) {
+                new Object[]{"Sel", "Folio", "Paciente", "Estudio", "Doctor", "Estado"}, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 0) {
@@ -315,17 +406,7 @@ public class SolicitudesFrame extends JFrame {
                     ajustandoSeleccion = false;
                     mostrarDetallesFila(filaModificada);
                 } else {
-                    boolean algunaSeleccionada = false;
-                    for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-                        if (Boolean.TRUE.equals(modeloTabla.getValueAt(i, 0))) {
-                            algunaSeleccionada = true;
-                            mostrarDetallesFila(i);
-                            break;
-                        }
-                    }
-                    if (!algunaSeleccionada) {
-                        modeloDetalles.setRowCount(0);
-                    }
+                    modeloDetalles.setRowCount(0);
                 }
             }
         });
@@ -352,7 +433,7 @@ public class SolicitudesFrame extends JFrame {
                 new EmptyBorder(10, 0, 0, 0)
         ));
 
-        String[] columnas = {"Paciente", "Doctor", "Solicitud", "Resultado"};
+        String[] columnas = {"Paciente", "Doctor", "Solicitud", "Estado"};
 
         modeloDetalles = new DefaultTableModel(null, columnas) {
             @Override
@@ -414,6 +495,8 @@ public class SolicitudesFrame extends JFrame {
         JButton btnCancelar = new JButton("Cancelar Solicitud");
         btnCancelar.setPreferredSize(new Dimension(160, 40));
 
+        btnCancelar.addActionListener(e -> cancelarSolicitud());
+
         JButton btnEditar = crearBotonOscuro("Editar solicitud");
         btnEditar.setPreferredSize(new Dimension(160, 40));
 
@@ -421,6 +504,35 @@ public class SolicitudesFrame extends JFrame {
         panel.add(btnEditar);
 
         return panel;
+    }
+
+    private void cancelarSolicitud() {
+        SolicitudDTO solicitudSeleccionada = obtenerSolicitudSeleccionada();
+        if (solicitudSeleccionada == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona una solicitud de la tabla para cancelarla.", "Sin selección", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro que deseas cancelar el Folio " + solicitudSeleccionada.getFolio() + "?", "Confirmar Cancelación", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                solicitudNegocio.cancelarSolicitud(solicitudSeleccionada.getId());
+                JOptionPane.showMessageDialog(this, "Solicitud cancelada con éxito.");
+                cargarDatos(); 
+            } catch (NegocioException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Error al cancelar", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private SolicitudDTO obtenerSolicitudSeleccionada() {
+        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+            Boolean estaMarcado = (Boolean) modeloTabla.getValueAt(i, 0);
+            if (Boolean.TRUE.equals(estaMarcado)) {
+                return (SolicitudDTO) filasVisibles.get(i)[0];
+            }
+        }
+        return null;
     }
 
     private JButton crearBotonOscuro(String texto) {
