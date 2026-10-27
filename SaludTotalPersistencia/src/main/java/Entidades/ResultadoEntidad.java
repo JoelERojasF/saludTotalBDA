@@ -43,9 +43,11 @@ public class ResultadoEntidad implements Serializable {
     public ResultadoEntidad() {
     }
 
-    public ResultadoEntidad(String resultado, String observacion) {
+    public ResultadoEntidad(String resultado, String observacion, SolicitudEntidad solicitud, ParametroEntidad parametro) {
         this.resultado = resultado;
         this.observacion = observacion;
+        this.solicitud = solicitud;
+        this.parametro = parametro;
     }
 
     public String getResultado() {

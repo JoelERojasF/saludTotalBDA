@@ -18,7 +18,7 @@ public class Validador {
     public boolean validarNombrePersona(String texto){
         if(texto == null || texto.isEmpty()) return false;
         
-        String patron = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]{1,50}$";
+        String patron = "^[A-Za-zÁÉÍÓÚáéíóúÑñ]+([ '-][A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$";
         return texto.trim().matches(patron);
     }
     
@@ -32,7 +32,7 @@ public class Validador {
     public boolean validarTexto(String texto){
         if(texto == null || texto.isEmpty()) return false;
         
-        String patron = "^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ0-9 .,/#-]+$";
+        String patron = "^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ0-9() .,/#-]+$";
         return texto.trim().matches(patron);
     }
     
@@ -89,7 +89,7 @@ public class Validador {
         }
     }
     
-    public static boolean validarFormatoFechaHora(String fecha){
+    public boolean validarFormatoFechaHora(String fecha){
         try {
             DateTimeFormatter formato = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").withResolverStyle(ResolverStyle.STRICT);
 

@@ -48,12 +48,13 @@ public class RangoEntidad implements Serializable {
     public RangoEntidad() {
     }
 
-    public RangoEntidad(String unidadMedida, Integer inicio, Integer fin, Integer edadInicio, Integer edadFin) {
+    public RangoEntidad(String unidadMedida, Integer inicio, Integer fin, Integer edadInicio, Integer edadFin, ParametroEntidad parametro) {
         this.unidadMedida = unidadMedida;
         this.inicio = inicio;
         this.fin = fin;
         this.edadInicio = edadInicio;
         this.edadFin = edadFin;
+        this.parametro = parametro;
     }
 
     public Integer getId() {

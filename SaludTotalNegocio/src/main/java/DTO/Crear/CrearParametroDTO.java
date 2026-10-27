@@ -13,13 +13,17 @@ public class CrearParametroDTO {
     private String nombre;
     private String descripcion;
     private Integer ordenAparicion;
+    private String valorInicial;
+    private String valorFinal;
     private Boolean numerico;
     private Integer idEstudio;
 
-    public CrearParametroDTO(String nombre, String descripcion, Integer ordenAparicion, Boolean numerico, Integer idEstudio) {
+    public CrearParametroDTO(String nombre, String descripcion, Integer ordenAparicion,String valorInicial, String valorFinal, Boolean numerico, Integer idEstudio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ordenAparicion = ordenAparicion;
+        this.valorInicial = valorInicial;
+        this.valorFinal = valorFinal;
         this.numerico = numerico;
         this.idEstudio = idEstudio;
     }
@@ -48,6 +52,22 @@ public class CrearParametroDTO {
         this.ordenAparicion = ordenAparicion;
     }
 
+    public String getValorInicial() {
+        return valorInicial;
+    }
+
+    public void setValorInicial(String valorInicial) {
+        this.valorInicial = valorInicial;
+    }
+
+    public String getValorFinal() {
+        return valorFinal;
+    }
+
+    public void setValorFinal(String valorFinal) {
+        this.valorFinal = valorFinal;
+    }
+
     public Boolean getNumerico() {
         return numerico;
     }
@@ -66,6 +86,8 @@ public class CrearParametroDTO {
 
     @Override
     public String toString() {
-        return "CrearParametroDTO{" + "nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", numerico=" + numerico + ", idEstudio=" + idEstudio + '}';
+        return "CrearParametroDTO{" + "nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + ", idEstudio=" + idEstudio + '}';
     }
+
+    
 }

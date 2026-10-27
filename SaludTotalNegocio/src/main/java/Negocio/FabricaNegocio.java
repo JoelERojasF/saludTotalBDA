@@ -23,11 +23,11 @@ public class FabricaNegocio {
     }
 
     public static IClienteNegocio crearClienteNegocio() {
-        return new ClienteNegocio(new ClienteDAO(CONEXION));
+        return new ClienteNegocio();
     }
 
     public static IDoctorNegocio crearDoctorNegocio() {
-        return new DoctorNegocio(new DoctorDAO(CONEXION));
+        return new DoctorNegocio();
     }
     
 }

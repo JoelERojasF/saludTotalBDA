@@ -14,12 +14,12 @@ public class ParametroDTO {
     private String nombre;
     private String descripcion;
     private Integer ordenAparicion;
-    private Integer valorInicial;
-    private Integer valorFinal;
+    private String valorInicial;
+    private String valorFinal;
     private Boolean numerico;
     private Integer idEstudio;
 
-    public ParametroDTO(Integer id, String nombre, String descripcion, Integer ordenAparicion, Integer valorInicial, Integer valorFinal, Boolean numerico, Integer idEstudio) {
+    public ParametroDTO(Integer id, String nombre, String descripcion, Integer ordenAparicion, String valorInicial, String valorFinal, Boolean numerico, Integer idEstudio) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -62,19 +62,19 @@ public class ParametroDTO {
         this.ordenAparicion = ordenAparicion;
     }
 
-    public Integer getValorInicial() {
+    public String getValorInicial() {
         return valorInicial;
     }
 
-    public void setValorInicial(Integer valorInicial) {
+    public void setValorInicial(String valorInicial) {
         this.valorInicial = valorInicial;
     }
 
-    public Integer getValorFinal() {
+    public String getValorFinal() {
         return valorFinal;
     }
 
-    public void setValorFinal(Integer valorFinal) {
+    public void setValorFinal(String valorFinal) {
         this.valorFinal = valorFinal;
     }
 

@@ -43,7 +43,7 @@ public class SolicitudEntidad implements Serializable {
     private ClienteEntidad cliente;
 
     @ManyToOne()
-    @JoinColumn(name = "idDoctor", nullable = false)
+    @JoinColumn(name = "idDoctor", nullable = true)
     private DoctorEntidad doctor;
     
     @ManyToOne()
@@ -56,11 +56,16 @@ public class SolicitudEntidad implements Serializable {
     public SolicitudEntidad() {
     }
 
-    public SolicitudEntidad(Timestamp fechaHoraGeneracion, ClienteEntidad cliente, DoctorEntidad doctor) {
+    public SolicitudEntidad(String folio, Timestamp fechaHoraGeneracion, Boolean cancelada, ClienteEntidad cliente, DoctorEntidad doctor, EstudioEntidad estudio) {
+        this.folio = folio;
         this.fechaHoraGeneracion = fechaHoraGeneracion;
+        this.cancelada = cancelada;
         this.cliente = cliente;
         this.doctor = doctor;
+        this.estudio = estudio;
     }
+
+    
 
     public Integer getId() {
         return id;

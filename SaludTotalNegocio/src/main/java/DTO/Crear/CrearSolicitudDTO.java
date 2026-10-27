@@ -19,8 +19,7 @@ public class CrearSolicitudDTO {
     private Integer idDoctor;
     private Integer idEstudio;
 
-    public CrearSolicitudDTO(Integer id, String folio, String fechaHoraGeneracion, Integer idCliente, Integer idDoctor, Integer idEstudio) {
-        this.id = id;
+    public CrearSolicitudDTO(String folio, String fechaHoraGeneracion, Integer idCliente, Integer idDoctor, Integer idEstudio) {
         this.folio = folio;
         this.fechaHoraGeneracion = fechaHoraGeneracion;
         this.cancelada = false;

@@ -4,8 +4,10 @@
  */
 package Negocio;
 
+import Conexion.ConexionBD;
 import DTO.Crear.CrearEmpresaDTO;
 import DTO.EmpresaDTO;
+import Daos.EmpresaDAO;
 import Daos.Interfaces.IEmpresaDAO;
 import Entidades.EmpresaEntidad;
 import Exception.NegocioException;
@@ -21,8 +23,8 @@ public class EmpresaNegocio implements IEmpresaNegocio{
     private final IEmpresaDAO empresaDAO;
     Validador val = new Validador();
 
-    public EmpresaNegocio(IEmpresaDAO empresaDAO) {
-        this.empresaDAO = empresaDAO;
+    public EmpresaNegocio() {
+        this.empresaDAO = new EmpresaDAO(new ConexionBD());
     }
 
     @Override

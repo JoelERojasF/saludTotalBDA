@@ -4,9 +4,11 @@
  */
 package Negocio;
 
+import Conexion.ConexionBD;
 import DTO.Crear.CrearTipoMuestraDTO;
 import DTO.TipoMuestraDTO;
 import Daos.Interfaces.ITipoMuestraDAO;
+import Daos.TipoMuestraDAO;
 import Entidades.TipoMuestraEntidad;
 import Exception.NegocioException;
 import Negocio.Interfaces.ITipoMuestraNegocio;
@@ -24,8 +26,8 @@ public class TipoMuestraNegocio implements ITipoMuestraNegocio{
     private final ITipoMuestraDAO tipoMuestraDAO;
     Validador val = new Validador();
 
-    public TipoMuestraNegocio(ITipoMuestraDAO tipoMuestraDAO) {
-        this.tipoMuestraDAO = tipoMuestraDAO;
+    public TipoMuestraNegocio() {
+        this.tipoMuestraDAO = new TipoMuestraDAO(new ConexionBD());
     }
     
     @Override
@@ -76,7 +78,7 @@ public class TipoMuestraNegocio implements ITipoMuestraNegocio{
             }
             tipoMuestraDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el tipo de muestra. Puede tener solicitudes registradas.", e);
+            throw new NegocioException("No se pudo eliminar el tipo de muestra.", e);
         }
     }
 
@@ -124,9 +126,10 @@ public class TipoMuestraNegocio implements ITipoMuestraNegocio{
     }
     
     private TipoMuestraEntidad DTOAEntidad(TipoMuestraDTO dto){
-        return new TipoMuestraEntidad(
-                    dto.getNombre().trim()
-                    );
+        TipoMuestraEntidad creado = new TipoMuestraEntidad(
+                    dto.getNombre().trim());
+        creado.setId(dto.getId());
+        return creado;
     }
     
     private TipoMuestraEntidad DTOAEntidad(CrearTipoMuestraDTO dto){

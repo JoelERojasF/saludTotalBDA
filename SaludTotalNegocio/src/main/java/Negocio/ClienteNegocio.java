@@ -1,9 +1,11 @@
 package Negocio;
 
+import Conexion.ConexionBD;
 import Exception.NegocioException;
 import Negocio.Interfaces.IClienteNegocio;
 import DTO.ClienteDTO;
 import DTO.Crear.CrearClienteDTO;
+import Daos.ClienteDAO;
 import Entidades.ClienteEntidad;
 import java.util.ArrayList;
 import java.sql.Date;
@@ -17,8 +19,8 @@ public class ClienteNegocio implements IClienteNegocio {
     private final IClienteDAO clienteDAO;
     Validador val = new Validador();
 
-    public ClienteNegocio(IClienteDAO clienteDAO) {
-        this.clienteDAO = clienteDAO;
+    public ClienteNegocio() {
+        this.clienteDAO = new ClienteDAO(new ConexionBD());
     }
 
     @Override
@@ -147,13 +149,15 @@ public class ClienteNegocio implements IClienteNegocio {
     }
 
     private ClienteEntidad DTOAEntidad(ClienteDTO dto) {
-        return new ClienteEntidad(
+        ClienteEntidad creado = new ClienteEntidad(
                 dto.getNombre().trim(),
                 val.vacioANulo(dto.getApellidoPaterno()),
                 val.vacioANulo(dto.getApellidoMaterno()),
                 Date.valueOf(dto.getFechaNacimiento()),
                 dto.getSexo(),
                 dto.getTipoSangre());
+        creado.setId(dto.getId());
+        return creado;
     }
 
     private ClienteEntidad DTOAEntidad(CrearClienteDTO dto) {

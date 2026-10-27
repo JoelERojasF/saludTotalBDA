@@ -47,9 +47,10 @@ public class EstudioEntidad implements Serializable {
     public EstudioEntidad() {
     }
 
-    public EstudioEntidad(String nombre, String descripcion) {
+    public EstudioEntidad(String nombre, String descripcion, TipoMuestraEntidad tipoMuestra) {
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.tipoMuestra = tipoMuestra;
     }
 
     public Integer getId() {

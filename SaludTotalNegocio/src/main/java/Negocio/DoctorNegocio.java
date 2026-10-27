@@ -4,8 +4,10 @@
  */
 package Negocio;
 
+import Conexion.ConexionBD;
 import DTO.Crear.CrearDoctorDTO;
 import DTO.DoctorDTO;
+import Daos.DoctorDAO;
 import Daos.Interfaces.IDoctorDAO;
 import Entidades.DoctorEntidad;
 import Exception.NegocioException;
@@ -24,8 +26,8 @@ public class DoctorNegocio implements IDoctorNegocio{
     private final IDoctorDAO doctorDAO;
     Validador val = new Validador();
 
-    public DoctorNegocio(IDoctorDAO doctorDAO) {
-        this.doctorDAO = doctorDAO;
+    public DoctorNegocio() {
+        this.doctorDAO = new DoctorDAO(new ConexionBD());
     }
 
     @Override
@@ -143,11 +145,13 @@ public class DoctorNegocio implements IDoctorNegocio{
     }
     
     private DoctorEntidad DTOAEntidad(DoctorDTO dto){
-        return new DoctorEntidad(
+        DoctorEntidad creado = new DoctorEntidad(
                     dto.getNombre().trim(),
                     val.vacioANulo(dto.getApellidoPaterno()),
                     val.vacioANulo(dto.getApellidoMaterno()),
                     dto.getSexo());
+        creado.setId(dto.getId());
+        return creado;
     }
     
     private DoctorEntidad DTOAEntidad(CrearDoctorDTO dto){

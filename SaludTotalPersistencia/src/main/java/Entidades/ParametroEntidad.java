@@ -38,10 +38,10 @@ public class ParametroEntidad implements Serializable {
     private Integer ordenAparicion;
     
     @Column(name = "valorInicial", nullable = true)
-    private Integer valorInicial;
+    private Float valorInicial;
     
     @Column(name = "valorFinal", nullable = true)
-    private Integer valorFinal;
+    private Float valorFinal;
     
     @Column(name = "numerico", nullable = false)
     private Boolean numerico;
@@ -59,10 +59,14 @@ public class ParametroEntidad implements Serializable {
     public ParametroEntidad() {
     }
 
-    public ParametroEntidad(String nombre, String descripcion, Integer ordenAparicion) {
+    public ParametroEntidad(String nombre, String descripcion, Integer ordenAparicion, Float valorInicial, Float valorFinal, Boolean numerico, EstudioEntidad estudio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ordenAparicion = ordenAparicion;
+        this.valorInicial = valorInicial;
+        this.valorFinal = valorFinal;
+        this.numerico = numerico;
+        this.estudio = estudio;
     }
 
     public Integer getId() {
@@ -97,19 +101,19 @@ public class ParametroEntidad implements Serializable {
         this.ordenAparicion = ordenAparicion;
     }
 
-    public Integer getValorInicial() {
+    public Float getValorInicial() {
         return valorInicial;
     }
 
-    public void setValorInicial(Integer valorInicial) {
+    public void setValorInicial(Float valorInicial) {
         this.valorInicial = valorInicial;
     }
 
-    public Integer getValorFinal() {
+    public Float getValorFinal() {
         return valorFinal;
     }
 
-    public void setValorFinal(Integer valorFinal) {
+    public void setValorFinal(Float valorFinal) {
         this.valorFinal = valorFinal;
     }
 
