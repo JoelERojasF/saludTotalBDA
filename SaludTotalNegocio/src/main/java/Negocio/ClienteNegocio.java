@@ -40,6 +40,7 @@ public class ClienteNegocio implements IClienteNegocio {
         try {
             return EntidadADTO(clienteDAO.guardar(entidad));
         } catch (PersistenciaException e) {
+             e.printStackTrace();
             throw new NegocioException("No se pudo registrar el cliente. Revisa la conexion con la base de datos.", e);
         }
     }

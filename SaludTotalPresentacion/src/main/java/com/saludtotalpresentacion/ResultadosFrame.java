@@ -193,6 +193,10 @@ public class ResultadosFrame extends JFrame {
             new SolicitudesFrame(usuarioActual).setVisible(true);
             dispose();
         });
+        btnReportes.addActionListener(e -> {
+            new ReportesFrame(usuarioActual).setVisible(true);
+            dispose();
+        });
 
         panel.add(btnEstudio);
         panel.add(btnSolicitudes);

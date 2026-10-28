@@ -313,6 +313,10 @@ public class SolicitudesFrame extends JFrame {
         });
 
         JButton btnReportes = crearBotonOscuro("Reportes");
+        btnReportes.addActionListener(e -> {
+            new ReportesFrame(usuarioActual).setVisible(true);
+            dispose();
+        });
 
         panel.add(btnEstudios);
         panel.add(btnSolicitudes);

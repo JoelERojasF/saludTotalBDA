@@ -205,6 +205,10 @@ public class RegistrarSolicitudFrame extends JFrame {
         });
 
         JButton btnReportes = crearBotonOscuro("Reportes");
+        btnReportes.addActionListener(e -> {
+            new ReportesFrame(usuarioActual).setVisible(true);
+            dispose();
+        });
         // ReportesFrame.addActionListener
 
         panel.add(btnEstudios);

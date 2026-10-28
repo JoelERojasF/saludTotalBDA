@@ -139,6 +139,10 @@ public class EditarEstudioFrame extends JFrame {
             new ResultadosFrame(usuarioActual).setVisible(true);
             dispose();
         });
+        btnReportes.addActionListener(e -> {
+            new ReportesFrame(usuarioActual).setVisible(true);
+            dispose();
+        });
         // TODO: btnReportes cuando exista ese frame
 
         panel.add(btnEstudio);
