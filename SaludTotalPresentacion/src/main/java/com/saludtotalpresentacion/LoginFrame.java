@@ -1,6 +1,8 @@
 package com.saludtotalpresentacion;
 
 import DTO.UsuarioDTO;
+import Exception.NegocioException;
+import Masivos.DatosMasivos;
 import Negocio.Interfaces.IUsuarioNegocio;
 import Negocio.UsuarioNegocio;
 import java.awt.BasicStroke;
@@ -28,8 +30,9 @@ import javax.swing.text.JTextComponent;
 public class LoginFrame extends JFrame {
 
     private final IUsuarioNegocio usuarioNegocio;
+    private final DatosMasivos DM = new DatosMasivos();
 
-    static final Color COLOR_FONDO = Color.WHITE;
+    static final Color COLOR_FONDO = new Color(0xF5F5F5);
     static final Color COLOR_TEXTO = new Color(0x1E1E1E);
     static final Color COLOR_BORDE = new Color(0xD9D9D9);
     static final Color COLOR_PLACEHOLDER = new Color(0xB3B3B3);
@@ -41,6 +44,7 @@ public class LoginFrame extends JFrame {
     private final CampoTexto txtNombre = new CampoTexto("Value");
     private final CampoPassword txtPassword = new CampoPassword("Value");
     private final BotonRedondeado btnRegistrar = new BotonRedondeado("Registrar");
+    private final BotonRedondeado btnDatosMasivos = new BotonRedondeado("Insertar datos");
     private final BotonRedondeado btnIniciarSesion = new BotonRedondeado("Iniciar Sesion");
 
     public LoginFrame() {
@@ -103,8 +107,11 @@ public class LoginFrame extends JFrame {
         b.insets = new Insets(0, 0, 0, 0);
         b.gridx = 0;
         panelBotones.add(btnRegistrar, b);
-        b.gridx = 1;
+        b.gridx = 2;
         panelBotones.add(btnIniciarSesion, b);
+        b.gridx = 1;
+        b.gridy = 1;
+        panelBotones.add(btnDatosMasivos, b);
 
         gbc.gridy = 5;
         gbc.weighty = 1;
@@ -123,6 +130,7 @@ public class LoginFrame extends JFrame {
     private void initEventos() {
         btnIniciarSesion.addActionListener(e -> iniciarSesion());
         btnRegistrar.addActionListener(e -> registrar());
+        btnDatosMasivos.addActionListener(e -> insertarDatos());
 
         // Enter en los campos inicia sesión
         txtNombre.addActionListener(e -> txtPassword.requestFocusInWindow());
@@ -159,6 +167,15 @@ public class LoginFrame extends JFrame {
     private void registrar() {
         new RegistrarAdminPresentacion().setVisible(true); // abre el otro frame
         dispose();                            // cierra el login
+    }
+    
+    private void insertarDatos(){
+        try {
+        DM.InsertsDatosMasivos();
+        btnDatosMasivos.setVisible(false);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error al insertar datos masivos", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     // ------------------------------------------------------------------

@@ -7,6 +7,7 @@ import Negocio.UsuarioNegocio;
 import com.saludtotalpresentacion.LoginFrame.BotonRedondeado;
 import com.saludtotalpresentacion.LoginFrame.CampoPassword;
 import com.saludtotalpresentacion.LoginFrame.CampoTexto;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -44,7 +45,7 @@ public class RegistrarAdminPresentacion extends JFrame {
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(java.awt.Color.WHITE);
+        panel.setBackground(new Color(0xF5F5F5));
         panel.setBorder(BorderFactory.createEmptyBorder(40, 30, 40, 30));
         setContentPane(panel);
 
