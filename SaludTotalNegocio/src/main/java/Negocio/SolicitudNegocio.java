@@ -50,9 +50,6 @@ public class SolicitudNegocio implements ISolicitudNegocio {
             throw new NegocioException("No se recibieron los datos de la solicitud.");
         }
         validar(dto.getFolio(), dto.getFechaHoraGeneracion(), dto.getIdCliente(), dto.getIdEstudio());
-        if (!(dto.getIdDoctor() > 0) || dto.getIdDoctor() == null) {
-            dto.setIdDoctor(null);
-        }
         try {
             SolicitudEntidad entidad = DTOAEntidad(dto);
             return EntidadADTO(solicitudDAO.guardar(entidad));
@@ -183,6 +180,16 @@ public class SolicitudNegocio implements ISolicitudNegocio {
     }
 
     private SolicitudDTO EntidadADTO(SolicitudEntidad e) {
+        if(e.getDoctor() == null){
+        return new SolicitudDTO(
+                e.getId(),
+                e.getFolio(),
+                e.getFechaHoraGeneracion().toString(),
+                e.getCancelada(),
+                e.getCliente().getId(),
+                null,
+                e.getEstudio().getId());
+        }
         return new SolicitudDTO(
                 e.getId(),
                 e.getFolio(),
@@ -206,6 +213,16 @@ public class SolicitudNegocio implements ISolicitudNegocio {
     }
 
     private SolicitudEntidad DTOAEntidad(CrearSolicitudDTO dto) throws PersistenciaException {
+        if(dto.getIdDoctor() == null){
+            return new SolicitudEntidad(
+                    dto.getFolio(),
+                    Timestamp.valueOf(dto.getFechaHoraGeneracion()),
+                    dto.getCancelada(),
+                    clienteDAO.buscarPorId(dto.getIdCliente()),
+                    null,
+                    estudioDAO.buscarPorId(dto.getIdEstudio()));
+        }
+        
         return new SolicitudEntidad(
                 dto.getFolio(),
                 Timestamp.valueOf(dto.getFechaHoraGeneracion()),
