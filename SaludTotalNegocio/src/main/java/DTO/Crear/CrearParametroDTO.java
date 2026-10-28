@@ -16,6 +16,7 @@ public class CrearParametroDTO {
     private String nombre;
     private String descripcion;
     private Integer ordenAparicion;
+    private String unidadMedida;
     private String valorInicial;
     private String valorFinal;
     private Boolean numerico;
@@ -23,10 +24,11 @@ public class CrearParametroDTO {
 
     private List<CrearRangoDTO> rangos = new ArrayList<>();
 
-    public CrearParametroDTO(String nombre, String descripcion, Integer ordenAparicion,String valorInicial, String valorFinal, Boolean numerico, Integer idEstudio) {
+    public CrearParametroDTO(String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, String valorInicial, String valorFinal, Boolean numerico, Integer idEstudio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ordenAparicion = ordenAparicion;
+        this.unidadMedida = unidadMedida;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
         this.numerico = numerico;
@@ -55,6 +57,14 @@ public class CrearParametroDTO {
 
     public void setOrdenAparicion(Integer ordenAparicion) {
         this.ordenAparicion = ordenAparicion;
+    }
+
+    public String getUnidadMedida() {
+        return unidadMedida;
+    }
+
+    public void setUnidadMedida(String unidadMedida) {
+        this.unidadMedida = unidadMedida;
     }
 
     public String getValorInicial() {
@@ -99,8 +109,7 @@ public class CrearParametroDTO {
 
     @Override
     public String toString() {
-        return "CrearParametroDTO{" + "nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + ", idEstudio=" + idEstudio + ", rangos=" + rangos + '}';
+        return "CrearParametroDTO{" + "nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + '}';
     }
-
     
 }

@@ -10,15 +10,14 @@ package DTO.Crear;
  */
 public class CrearRangoDTO {
     
-    private String unidadMedida;
-    private Integer inicio;
-    private Integer fin;
+    
+    private Double inicio;
+    private Double fin;
     private Integer edadInicio;
     private Integer edadFin;
     private Integer idParametro;
 
-    public CrearRangoDTO(String unidadMedida, Integer inicio, Integer fin, Integer edadInicio, Integer edadFin, Integer idParametro) {
-        this.unidadMedida = unidadMedida;
+    public CrearRangoDTO( Double inicio, Double fin, Integer edadInicio, Integer edadFin, Integer idParametro) {
         this.inicio = inicio;
         this.fin = fin;
         this.edadInicio = edadInicio;
@@ -26,27 +25,19 @@ public class CrearRangoDTO {
         this.idParametro = idParametro;
     }
 
-    public String getUnidadMedida() {
-        return unidadMedida;
-    }
-
-    public void setUnidadMedida(String unidadMedida) {
-        this.unidadMedida = unidadMedida;
-    }
-
-    public Integer getInicio() {
+    public Double getInicio() {
         return inicio;
     }
 
-    public void setInicio(Integer inicio) {
+    public void setInicio(Double inicio) {
         this.inicio = inicio;
     }
 
-    public Integer getFin() {
+    public Double getFin() {
         return fin;
     }
 
-    public void setFin(Integer fin) {
+    public void setFin(Double fin) {
         this.fin = fin;
     }
 
@@ -76,7 +67,7 @@ public class CrearRangoDTO {
 
     @Override
     public String toString() {
-        return "CrearRangoDTO{" + "unidadMedida=" + unidadMedida + ", inicio=" + inicio + ", fin=" + fin + ", edadInicio=" + edadInicio + ", edadFin=" + edadFin + ", idParametro=" + idParametro + '}';
+        return "CrearRangoDTO{" + ", inicio=" + inicio + ", fin=" + fin + ", edadInicio=" + edadInicio + ", edadFin=" + edadFin + ", idParametro=" + idParametro + '}';
     }
     
     

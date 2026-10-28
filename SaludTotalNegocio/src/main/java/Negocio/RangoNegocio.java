@@ -37,7 +37,7 @@ public class RangoNegocio implements IRangoNegocio{
         if (dto == null) {
             throw new NegocioException("No se recibieron los datos del rango.");
         }
-        validar(dto.getUnidadMedida(), dto.getInicio(), dto.getFin(), dto.getEdadInicio(), dto.getEdadFin(), dto.getIdParametro());
+        validar( dto.getInicio(), dto.getFin(), dto.getEdadInicio(), dto.getEdadFin(), dto.getIdParametro());
 
         try {
             RangoEntidad entidad = DTOAEntidad(dto);
@@ -52,7 +52,7 @@ public class RangoNegocio implements IRangoNegocio{
         if (dto == null || dto.getId() == null) {
             throw new NegocioException("Falta el id del rango a actualizar.");
         }
-        validar(dto.getUnidadMedida(), dto.getInicio(), dto.getFin(), dto.getEdadInicio(), dto.getEdadFin(), dto.getIdParametro());
+        validar(dto.getInicio(), dto.getFin(), dto.getEdadInicio(), dto.getEdadFin(), dto.getIdParametro());
 
         try {
             if (rangoDAO.buscarPorId(dto.getId()) == null) {
@@ -116,10 +116,7 @@ public class RangoNegocio implements IRangoNegocio{
         }
     }
     
-    private void validar(String unidadMedida, Integer inicio, Integer fin, Integer edadInicio, Integer edadFin, Integer idParametro) throws NegocioException {
-        if (!val.validarTexto(unidadMedida)) {
-            throw new NegocioException("El nombre es invalido.");
-        }
+    private void validar(Double inicio, Double fin, Integer edadInicio, Integer edadFin, Integer idParametro) throws NegocioException {
         if (!(inicio > 0)) {
             throw new NegocioException("El inicio del rango es invalido.");
         }
@@ -146,7 +143,6 @@ public class RangoNegocio implements IRangoNegocio{
     private RangoDTO EntidadADTO(RangoEntidad e) {
         return new RangoDTO(
                 e.getId(),
-                e.getUnidadMedida(),
                 e.getInicio(),
                 e.getFin(),
                 e.getEdadInicio(),
@@ -156,7 +152,6 @@ public class RangoNegocio implements IRangoNegocio{
 
     private RangoEntidad DTOAEntidad(RangoDTO dto) throws PersistenciaException {
         RangoEntidad creado = new RangoEntidad(
-                dto.getUnidadMedida(),
                 dto.getInicio(),
                 dto.getFin(),
                 dto.getEdadInicio(),
@@ -168,7 +163,6 @@ public class RangoNegocio implements IRangoNegocio{
 
     private RangoEntidad DTOAEntidad(CrearRangoDTO dto) throws PersistenciaException {
         return new RangoEntidad(
-                dto.getUnidadMedida(),
                 dto.getInicio(),
                 dto.getFin(),
                 dto.getEdadInicio(),

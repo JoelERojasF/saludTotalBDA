@@ -429,7 +429,7 @@ public class ResultadosFrame extends JFrame {
                         if (Boolean.TRUE.equals(p.getNumerico())) {
                             for (RangoDTO r : todosRangosBD) {
                                 if (r.getIdParametro().equals(p.getId())) {
-                                    unidad = r.getUnidadMedida();
+                                    unidad = p.getUnidadMedida();
                                     rangoStr = r.getInicio() + " - " + r.getFin();
                                     break; // Solo tomamos el primero de forma visual
                                 }

@@ -36,7 +36,7 @@ public class ParametroNegocio implements IParametroNegocio{
         if (dto == null) {
             throw new NegocioException("No se recibieron los datos del parametro.");
         }
-        validar(dto.getNombre(), dto.getDescripcion(), dto.getOrdenAparicion(), dto.getIdEstudio());
+        validar(dto.getNombre(), dto.getDescripcion(), dto.getOrdenAparicion(), dto.getUnidadMedida(), dto.getIdEstudio());
         if(!dto.getNumerico()){
             dto.setValorInicial(null);
             dto.setValorFinal(null);
@@ -62,7 +62,7 @@ public class ParametroNegocio implements IParametroNegocio{
         if (dto == null || dto.getId() == null) {
             throw new NegocioException("Falta el id del parametro a actualizar.");
         }
-        validar(dto.getNombre(), dto.getDescripcion(), dto.getOrdenAparicion(), dto.getIdEstudio());
+        validar(dto.getNombre(), dto.getDescripcion(), dto.getOrdenAparicion(),dto.getUnidadMedida(), dto.getIdEstudio());
         if(!dto.getNumerico()){
             dto.setValorInicial(null);
             dto.setValorFinal(null);
@@ -137,7 +137,7 @@ public class ParametroNegocio implements IParametroNegocio{
         }
     }
     
-     private void validar(String nombre, String descripcion, Integer ordenAparicion,  Integer idEstudio) throws NegocioException {
+     private void validar(String nombre, String descripcion, Integer ordenAparicion,String unidadMedida,  Integer idEstudio) throws NegocioException {
         if (!val.validarNombrePersona(nombre)) {
             throw new NegocioException("El nombre es invalido.");
         }
@@ -147,6 +147,9 @@ public class ParametroNegocio implements IParametroNegocio{
         if (!(ordenAparicion > 0)) {
             throw new NegocioException("El orden de aparicion es invalido.");
         }
+         if (!val.validarTexto(unidadMedida)) {
+             throw new NegocioException("El nombre es invalido.");
+         }
         if (!(idEstudio > 0)) {
             throw new NegocioException("El id del estudio es invalido.");
         }
@@ -158,6 +161,7 @@ public class ParametroNegocio implements IParametroNegocio{
                 e.getNombre(),
                 e.getDescripcion(),
                 e.getOrdenAparicion(),
+                e.getUnidadMedida(),
                 e.getValorInicial()+"",
                 e.getValorFinal()+"",
                 e.getNumerico(),
@@ -169,8 +173,9 @@ public class ParametroNegocio implements IParametroNegocio{
                 dto.getNombre(),
                 dto.getDescripcion(),
                 dto.getOrdenAparicion(),
-                Float.parseFloat(dto.getValorInicial()),
-                Float.parseFloat(dto.getValorFinal()),
+                dto.getUnidadMedida(),
+                Double.parseDouble(dto.getValorInicial()),
+                Double.parseDouble(dto.getValorFinal()),
                 dto.getNumerico(),
                 estudioDAO.buscarPorId(dto.getIdEstudio()));
         creado.setId(dto.getId());
@@ -182,8 +187,9 @@ public class ParametroNegocio implements IParametroNegocio{
                 dto.getNombre(),
                 dto.getDescripcion(),
                 dto.getOrdenAparicion(),
-                Float.parseFloat(dto.getValorInicial()),
-                Float.parseFloat(dto.getValorFinal()),
+                dto.getUnidadMedida(),
+                Double.parseDouble(dto.getValorInicial()),
+                Double.parseDouble(dto.getValorFinal()),
                 dto.getNumerico(),
                 estudioDAO.buscarPorId(dto.getIdEstudio()));
     }

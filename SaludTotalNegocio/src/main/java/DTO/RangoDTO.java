@@ -10,16 +10,14 @@ package DTO;
  */
 public class RangoDTO {
     private Integer id;
-    private String unidadMedida;
-    private Integer inicio;
-    private Integer fin;
+    private Double inicio;
+    private Double fin;
     private Integer edadInicio;
     private Integer edadFin;
     private Integer idParametro;
 
-    public RangoDTO(Integer id, String unidadMedida, Integer inicio, Integer fin, Integer edadInicio, Integer edadFin, Integer idParametro) {
+    public RangoDTO(Integer id, Double inicio, Double fin, Integer edadInicio, Integer edadFin, Integer idParametro) {
         this.id = id;
-        this.unidadMedida = unidadMedida;
         this.inicio = inicio;
         this.fin = fin;
         this.edadInicio = edadInicio;
@@ -35,27 +33,19 @@ public class RangoDTO {
         this.id = id;
     }
 
-    public String getUnidadMedida() {
-        return unidadMedida;
-    }
-
-    public void setUnidadMedida(String unidadMedida) {
-        this.unidadMedida = unidadMedida;
-    }
-
-    public Integer getInicio() {
+    public Double getInicio() {
         return inicio;
     }
 
-    public void setInicio(Integer inicio) {
+    public void setInicio(Double inicio) {
         this.inicio = inicio;
     }
 
-    public Integer getFin() {
+    public Double getFin() {
         return fin;
     }
 
-    public void setFin(Integer fin) {
+    public void setFin(Double fin) {
         this.fin = fin;
     }
 
@@ -85,7 +75,7 @@ public class RangoDTO {
 
     @Override
     public String toString() {
-        return "RangoDTO{" + "id=" + id + ", unidadMedida=" + unidadMedida + ", inicio=" + inicio + ", fin=" + fin + ", edadInicio=" + edadInicio + ", edadFin=" + edadFin + ", idParametro=" + idParametro + '}';
+        return "RangoDTO{" + "id=" + id + ", inicio=" + inicio + ", fin=" + fin + ", edadInicio=" + edadInicio + ", edadFin=" + edadFin + ", idParametro=" + idParametro + '}';
     }
     
     

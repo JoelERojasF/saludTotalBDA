@@ -332,7 +332,7 @@ public class AgregarEstudioFrame extends JFrame {
                 modeloParametros.addRow(new Object[]{
                     p.getOrdenAparicion(),
                     p.getNombre(),
-                    r.getUnidadMedida(),
+                    p.getUnidadMedida(),
                     r.getInicio() + "-" + r.getFin(),
                     r.getEdadInicio() + "-" + r.getEdadFin(),
                     p.getDescripcion()

@@ -14,16 +14,18 @@ public class ParametroDTO {
     private String nombre;
     private String descripcion;
     private Integer ordenAparicion;
+    private String unidadMedida;
     private String valorInicial;
     private String valorFinal;
     private Boolean numerico;
     private Integer idEstudio;
 
-    public ParametroDTO(Integer id, String nombre, String descripcion, Integer ordenAparicion, String valorInicial, String valorFinal, Boolean numerico, Integer idEstudio) {
+    public ParametroDTO(Integer id, String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, String valorInicial, String valorFinal, Boolean numerico, Integer idEstudio) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ordenAparicion = ordenAparicion;
+        this.unidadMedida = unidadMedida;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
         this.numerico = numerico;
@@ -62,6 +64,14 @@ public class ParametroDTO {
         this.ordenAparicion = ordenAparicion;
     }
 
+    public String getUnidadMedida() {
+        return unidadMedida;
+    }
+
+    public void setUnidadMedida(String unidadMedida) {
+        this.unidadMedida = unidadMedida;
+    }
+
     public String getValorInicial() {
         return valorInicial;
     }
@@ -96,8 +106,7 @@ public class ParametroDTO {
 
     @Override
     public String toString() {
-        return "ParametroDTO{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + ", idEstudio=" + idEstudio + '}';
+        return "ParametroDTO{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + ", idEstudio=" + idEstudio + '}';
     }
-    
     
 }

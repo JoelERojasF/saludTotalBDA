@@ -48,6 +48,7 @@ public class AgregarParametrosFrame extends JFrame{
     private final CampoTexto txtNombre = new CampoTexto("nombre");
     private final CampoTexto txtDescripcion = new CampoTexto("descripcion");
     private final CampoTexto txtOrden = new CampoTexto("orden");
+    private final CampoTexto txtUnidadMedida = new CampoTexto("unidad de medida");
     private final AreaTexto txtRango = new AreaTexto("4  -  10 g/dL  20 - 25 años");
 
     // Rangos capturados; el idParametro queda en null: lo asigna la capa de negocio al guardar
@@ -82,6 +83,7 @@ public class AgregarParametrosFrame extends JFrame{
         agregarCampo(panel, "Nombre:", txtNombre);
         agregarCampo(panel, "Descripcion", txtDescripcion);
         agregarCampo(panel, "Orden", txtOrden);
+        agregarCampo(panel, "unidad de medida", txtUnidadMedida);
 
         panel.add(crearEtiqueta("Rango"));
         panel.add(Box.createVerticalStrut(4));
@@ -157,7 +159,6 @@ public class AgregarParametrosFrame extends JFrame{
     private void registrarRango() {
         JTextField txtMin = new JTextField();
         JTextField txtMax = new JTextField();
-        JTextField txtUnidad = new JTextField();
         JTextField txtEdadMin = new JTextField();
         JTextField txtEdadMax = new JTextField();
 
@@ -166,8 +167,6 @@ public class AgregarParametrosFrame extends JFrame{
         form.add(txtMin);
         form.add(new JLabel("Valor maximo:"));
         form.add(txtMax);
-        form.add(new JLabel("Unidad (ej. g/dL):"));
-        form.add(txtUnidad);
         form.add(new JLabel("Edad minima:"));
         form.add(txtEdadMin);
         form.add(new JLabel("Edad maxima:"));
@@ -179,26 +178,26 @@ public class AgregarParametrosFrame extends JFrame{
             return;
         }
 
-        String unidad = txtUnidad.getText().trim();
-        if (unidad.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "La unidad es obligatoria.",
-                    "Rango invalido", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
         // Solo se valida el formato de captura; las reglas de negocio las valida la capa de negocio
-        int vMin;
-        int vMax;
+        double vMin;
+        double vMax;
         int eMin;
         int eMax;
         try {
-            vMin = Integer.parseInt(txtMin.getText().trim());
-            vMax = Integer.parseInt(txtMax.getText().trim());
+            vMin = Double.parseDouble(txtMin.getText().trim());
+            vMax = Double.parseDouble(txtMax.getText().trim());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Los valores deben ser numeros.",
+                    "Rango invalido", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        try {
             eMin = Integer.parseInt(txtEdadMin.getText().trim());
             eMax = Integer.parseInt(txtEdadMax.getText().trim());
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this,
-                    "Los valores y las edades deben ser numeros enteros.",
+                    "Las edades deben ser numeros enteros.",
                     "Rango invalido", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -224,16 +223,17 @@ public class AgregarParametrosFrame extends JFrame{
             return;
         }
 
-        rangos.add(new CrearRangoDTO(unidad, vMin, vMax, eMin, eMax, null));
-        txtRango.append(vMin + "  -  " + vMax + " " + unidad + "  " + eMin + " - " + eMax + " años\n");
+        rangos.add(new CrearRangoDTO( vMin, vMax, eMin, eMax, null));
+        txtRango.append(vMin + "  -  " + vMax + "  " + eMin + " - " + eMax + " años\n");
     }
 
     private void registrar() {
         String nombre = txtNombre.getText().trim();
         String descripcion = txtDescripcion.getText().trim();
+        String unidadMedida = txtUnidadMedida.getText().trim();
 
-        if (nombre.isEmpty() || descripcion.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "El nombre y la descripcion son obligatorios.",
+        if (nombre.isEmpty() || descripcion.isEmpty() || unidadMedida.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El nombre, la descripcion y la unidad de medida son obligatorios.",
                     "Campos vacios", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -258,7 +258,7 @@ public class AgregarParametrosFrame extends JFrame{
         // numerico = true porque cada parametro se define con rangos numericos;
         // valorInicial / valorFinal quedan en null (columnas opcionales)
         CrearParametroDTO parametro = new CrearParametroDTO(
-                nombre, descripcion, orden, null, null, true, null);
+                nombre, descripcion, orden, unidadMedida, null, null, true, null);
         parametro.setRangos(new ArrayList<>(rangos));
 
         alRegistrar.accept(parametro);

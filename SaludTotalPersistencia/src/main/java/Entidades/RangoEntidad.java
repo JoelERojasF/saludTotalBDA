@@ -26,14 +26,11 @@ public class RangoEntidad implements Serializable {
     @Column(name = "id")
     private Integer id;
     
-    @Column(name = "unidadMedida", nullable = false)
-    private String unidadMedida;
-    
     @Column(name = "inicio", nullable = false)
-    private Integer inicio;
+    private Double inicio;
     
     @Column(name = "fin", nullable = false)
-    private Integer fin;
+    private Double fin;
     
     @Column(name = "edadInicio", nullable = false)
     private Integer edadInicio;
@@ -48,8 +45,7 @@ public class RangoEntidad implements Serializable {
     public RangoEntidad() {
     }
 
-    public RangoEntidad(String unidadMedida, Integer inicio, Integer fin, Integer edadInicio, Integer edadFin, ParametroEntidad parametro) {
-        this.unidadMedida = unidadMedida;
+    public RangoEntidad(Double inicio, Double fin, Integer edadInicio, Integer edadFin, ParametroEntidad parametro) {
         this.inicio = inicio;
         this.fin = fin;
         this.edadInicio = edadInicio;
@@ -65,27 +61,19 @@ public class RangoEntidad implements Serializable {
         this.id = id;
     }
 
-    public String getUnidadMedida() {
-        return unidadMedida;
-    }
-
-    public void setUnidadMedida(String unidadMedida) {
-        this.unidadMedida = unidadMedida;
-    }
-
-    public Integer getInicio() {
+    public Double getInicio() {
         return inicio;
     }
 
-    public void setInicio(Integer inicio) {
+    public void setInicio(Double inicio) {
         this.inicio = inicio;
     }
 
-    public Integer getFin() {
+    public Double getFin() {
         return fin;
     }
 
-    public void setFin(Integer fin) {
+    public void setFin(Double fin) {
         this.fin = fin;
     }
 
@@ -115,7 +103,7 @@ public class RangoEntidad implements Serializable {
 
     @Override
     public String toString() {
-        return "RangoEntidad{" + "id=" + id + ", unidadMedida=" + unidadMedida + ", inicio=" + inicio + ", fin=" + fin + ", edadInicio=" + edadInicio + ", edadFin=" + edadFin + '}';
+        return "RangoEntidad{" + "id=" + id +  ", inicio=" + inicio + ", fin=" + fin + ", edadInicio=" + edadInicio + ", edadFin=" + edadFin + '}';
     }
     
 }

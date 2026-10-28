@@ -37,11 +37,14 @@ public class ParametroEntidad implements Serializable {
     @Column(name = "ordenAparicion", nullable = false)
     private Integer ordenAparicion;
     
+    @Column(name = "unidadMedida", nullable = false)
+    private String unidadMedida;
+    
     @Column(name = "valorInicial", nullable = true)
-    private Float valorInicial;
+    private Double valorInicial;
     
     @Column(name = "valorFinal", nullable = true)
-    private Float valorFinal;
+    private Double valorFinal;
     
     @Column(name = "numerico", nullable = false)
     private Boolean numerico;
@@ -59,10 +62,11 @@ public class ParametroEntidad implements Serializable {
     public ParametroEntidad() {
     }
 
-    public ParametroEntidad(String nombre, String descripcion, Integer ordenAparicion, Float valorInicial, Float valorFinal, Boolean numerico, EstudioEntidad estudio) {
+    public ParametroEntidad(String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, Double valorInicial, Double valorFinal, Boolean numerico, EstudioEntidad estudio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ordenAparicion = ordenAparicion;
+        this.unidadMedida = unidadMedida;
         this.valorInicial = valorInicial;
         this.valorFinal = valorFinal;
         this.numerico = numerico;
@@ -101,19 +105,27 @@ public class ParametroEntidad implements Serializable {
         this.ordenAparicion = ordenAparicion;
     }
 
-    public Float getValorInicial() {
+    public String getUnidadMedida() {
+        return unidadMedida;
+    }
+
+    public void setUnidadMedida(String unidadMedida) {
+        this.unidadMedida = unidadMedida;
+    }
+    
+    public Double getValorInicial() {
         return valorInicial;
     }
 
-    public void setValorInicial(Float valorInicial) {
+    public void setValorInicial(Double valorInicial) {
         this.valorInicial = valorInicial;
     }
 
-    public Float getValorFinal() {
+    public Double getValorFinal() {
         return valorFinal;
     }
 
-    public void setValorFinal(Float valorFinal) {
+    public void setValorFinal(Double valorFinal) {
         this.valorFinal = valorFinal;
     }
 
@@ -151,7 +163,7 @@ public class ParametroEntidad implements Serializable {
 
     @Override
     public String toString() {
-        return "ParametroEntidad{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + '}';
+        return "ParametroEntidad{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + '}';
     }
     
     

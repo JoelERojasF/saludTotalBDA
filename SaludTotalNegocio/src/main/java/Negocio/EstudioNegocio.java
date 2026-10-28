@@ -188,6 +188,9 @@ public class EstudioNegocio implements IEstudioNegocio {
             if (p.getOrdenAparicion() == null || p.getOrdenAparicion() <= 0) {
                 throw new NegocioException("El orden de aparicion del parametro '" + p.getNombre() + "' es invalido.");
             }
+            if (!val.validarTexto(p.getUnidadMedida())) {
+                throw new NegocioException("La unidad de medida del parametro '" + p.getNombre() + "' es invalida.");
+            }
             if (Boolean.TRUE.equals(p.getNumerico())) {
                 if (p.getRangos() == null || p.getRangos().isEmpty()) {
                     throw new NegocioException("El parametro '" + p.getNombre() + "' necesita al menos un rango.");
@@ -202,9 +205,6 @@ public class EstudioNegocio implements IEstudioNegocio {
     private void validarRango(String parametro, CrearRangoDTO r) throws NegocioException {
         if (r == null) {
             throw new NegocioException("El parametro '" + parametro + "' tiene un rango sin datos.");
-        }
-        if (!val.validarTexto(r.getUnidadMedida())) {
-            throw new NegocioException("La unidad de medida del parametro '" + parametro + "' es invalida.");
         }
         if (r.getInicio() == null || r.getFin() == null || r.getInicio() < 0 || r.getFin() < 0) {
             throw new NegocioException("Los valores del rango de '" + parametro + "' son invalidos.");
@@ -227,14 +227,14 @@ public class EstudioNegocio implements IEstudioNegocio {
     private ParametroEntidad parametroAEntidad(CrearParametroDTO p) {
         boolean numerico = Boolean.TRUE.equals(p.getNumerico());
 
-        Float valorInicial = null;
-        Float valorFinal = null;
+        Double valorInicial = null;
+        Double valorFinal = null;
         if (numerico) {
             if (val.validarNumeroDecimal(p.getValorInicial())) {
-                valorInicial = Float.parseFloat(p.getValorInicial().trim());
+                valorInicial = Double.parseDouble(p.getValorInicial().trim());
             }
             if (val.validarNumeroDecimal(p.getValorFinal())) {
-                valorFinal = Float.parseFloat(p.getValorFinal().trim());
+                valorFinal = Double.parseDouble(p.getValorFinal().trim());
             }
         }
 
@@ -242,6 +242,7 @@ public class EstudioNegocio implements IEstudioNegocio {
                 p.getNombre().trim(),
                 p.getDescripcion().trim(),
                 p.getOrdenAparicion(),
+                p.getUnidadMedida(),
                 valorInicial,
                 valorFinal,
                 numerico,
@@ -251,7 +252,6 @@ public class EstudioNegocio implements IEstudioNegocio {
         if (numerico) {
             for (CrearRangoDTO r : p.getRangos()) {
                 rangos.add(new RangoEntidad(
-                        r.getUnidadMedida().trim(),
                         r.getInicio(),
                         r.getFin(),
                         r.getEdadInicio(),
