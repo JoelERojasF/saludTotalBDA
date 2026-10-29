@@ -136,6 +136,7 @@ public class SolicitudNegocio implements ISolicitudNegocio {
         }
     }
 
+    @Override
     public List<SolicitudDTO> obtenerTodosActivos() throws NegocioException {
         try {
             List<SolicitudDTO> lista = new ArrayList<>();
@@ -150,11 +151,12 @@ public class SolicitudNegocio implements ISolicitudNegocio {
         }
     }
 
+    @Override
     public List<SolicitudDTO> obtenerTodosPendientes() throws NegocioException {
         try {
             List<SolicitudDTO> lista = new ArrayList<>();
             for (SolicitudEntidad e : solicitudDAO.obtenerTodos()) {
-                if (e.getResultados().size() == 0) {
+                if (e.getResultados().size() == 0 && e.getCancelada() == false) {
                     lista.add(EntidadADTO(e));
                 }
             }

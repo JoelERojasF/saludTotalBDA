@@ -23,4 +23,8 @@ public interface ISolicitudNegocio {
     SolicitudDTO buscarPorId(Integer id) throws NegocioException;
 
     List<SolicitudDTO> obtenerTodos() throws NegocioException;
+    
+    public List<SolicitudDTO> obtenerTodosActivos() throws NegocioException;
+    
+    public List<SolicitudDTO> obtenerTodosPendientes() throws NegocioException;
 }

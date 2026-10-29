@@ -136,7 +136,7 @@ public class SolicitudesFrame extends JFrame {
             listaDoctores = doctorNegocio.obtenerTodos();
             listaEstudios = estudioNegocio.obtenerTodos();
 
-            List<SolicitudDTO> listaSolicitudes = solicitudNegocio.obtenerTodos();
+            List<SolicitudDTO> listaSolicitudes = solicitudNegocio.obtenerTodosActivos();
 
             todasLasFilas.clear();
 
@@ -148,10 +148,10 @@ public class SolicitudesFrame extends JFrame {
                 String nombreCliente = cli != null ? nombreCompletoCliente(cli) : "Desconocido";
                 String nombreDoctor = doc != null ? "DR. " + nombreCompletoDoctor(doc) : "N/A (Cuenta propia)";
                 String nombreEstudio = est != null ? est.getNombre() : "Desconocido";
-                String estado = sol.getCancelada() ? "Cancelada" : "Pendiente";
+                
 
                 Object[] filaData = new Object[]{
-                    sol, false, sol.getFolio(), nombreCliente, nombreEstudio, nombreDoctor, estado
+                    sol, false, sol.getFolio(), nombreCliente, nombreEstudio, nombreDoctor
                 };
 
                 todasLasFilas.add(filaData);
@@ -180,7 +180,7 @@ public class SolicitudesFrame extends JFrame {
             if (folio.contains(textoBusqueda) || paciente.contains(textoBusqueda)) {
                 filasVisibles.add(fila);
                 modeloTabla.addRow(new Object[]{
-                    fila[1], fila[2], fila[3], fila[4], fila[5], fila[6]
+                    fila[1], fila[2], fila[3], fila[4], fila[5]
                 });
             }
         }
@@ -375,7 +375,7 @@ public class SolicitudesFrame extends JFrame {
         panel.setBackground(COLOR_FONDO);
 
         modeloTabla = new DefaultTableModel(
-                new Object[]{"Sel", "Folio", "Paciente", "Estudio", "Doctor", "Estado"}, 0) {
+                new Object[]{"Sel", "Folio", "Paciente", "Estudio", "Doctor"}, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 if (columnIndex == 0) {
