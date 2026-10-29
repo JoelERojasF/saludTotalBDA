@@ -134,7 +134,7 @@ public class ReportesFrame extends JFrame{
  
         JButton btnGenerar = new JButton("Generar Reporte PDF");
         btnGenerar.addActionListener(e -> {
-            new ReportePDFrame(s).setVisible(true);
+            new ReportePDFrame(s,usuarioActual).setVisible(true);
             this.dispose();
         });
         btnGenerar.setFont(FUENTE_NORMAL);

@@ -6,6 +6,7 @@ package com.saludtotalpresentacion;
 import DTO.ClienteDTO;
 import DTO.DoctorDTO;
 import DTO.EstudioDTO;
+import DTO.ResultadoDTO;
 import DTO.SolicitudDTO;
 import DTO.UsuarioDTO;
 import Exception.NegocioException;
@@ -14,6 +15,7 @@ import Negocio.Interfaces.IClienteNegocio;
 import Negocio.Interfaces.IDoctorNegocio;
 import Negocio.Interfaces.IEstudioNegocio;
 import Negocio.Interfaces.ISolicitudNegocio;
+import Negocio.ResultadoNegocio;
 import Negocio.SolicitudNegocio;
 import com.saludtotalpresentacion.LoginFrame.CampoTexto;
 import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
@@ -223,7 +225,23 @@ public class SolicitudesFrame extends JFrame {
                 + "Fecha:\n" + solicitud.getFechaHoraGeneracion() + "\n\n"
                 + "Estudio:\n" + (estudio != null ? estudio.getNombre() : "N/A");
 
-        String textoEstado = solicitud.getCancelada() ? "CANCELADA" : "PENDIENTE";
+        boolean tieneResultado = false;
+        try {
+            for (ResultadoDTO r : new ResultadoNegocio().obtenerTodos()) {
+                if (r.getIdSolicitud().equals(solicitud.getId())) {
+                    tieneResultado = true;
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
+
+        String textoEstado = "PENDIENTE";
+        if (solicitud.getCancelada()) {
+            textoEstado = "CANCELADA";
+        } else if (tieneResultado) {
+            textoEstado = "CON RESULTADO";
+        }
 
         modeloDetalles.addRow(new Object[]{
             textoPaciente,

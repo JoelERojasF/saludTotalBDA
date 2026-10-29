@@ -437,7 +437,7 @@ public class ResultadosFrame extends JFrame {
                         }
 
                         modeloParametros.addRow(new Object[]{
-                            p.getOrdenAparicion() + " " + p.getNombre(), "", unidad, rangoStr, ""
+                            p.getOrdenAparicion() + " " + p.getNombre(), " Ingrese el resultado ", unidad, rangoStr, " Ingrese la Observacion "
                         });
                     }
                 }
