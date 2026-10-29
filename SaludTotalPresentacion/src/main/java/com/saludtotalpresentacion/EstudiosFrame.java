@@ -41,11 +41,10 @@ public class EstudiosFrame extends JFrame {
 
     private final UsuarioDTO usuarioActual;
 
-    // Cada estudio: {nombre, descripcion, muestra, parametro}
     private final List<String[]> todos = new ArrayList<>();
     private final List<String[]> visibles = new ArrayList<>();
     private boolean cargando = false;
-    private String[] seleccionado; // estudio marcado en la lista
+    private String[] seleccionado; 
 
     private final CampoTexto txtBuscar = new CampoTexto("buscar estudio");
 
@@ -142,14 +141,11 @@ public class EstudiosFrame extends JFrame {
             }
         });
 
-        // Reemplazamos la función de datos demo por la consulta real a la BD
         cargarEstudios();
         setContentPane(panelPrincipal);
     }
 
-    // ------------------------------------------------------------------
-    // Construccion de la UI
-    // ------------------------------------------------------------------
+  
     private JPanel crearBarraNavegacion() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 0));
         panel.setBackground(COLOR_FONDO);
@@ -161,7 +157,6 @@ public class EstudiosFrame extends JFrame {
         JButton btnResultado = crearBoton("Resultado");
         JButton btnReportes = crearBoton("Reportes");
 
-        // ya estamos en Estudio
         btnSolicitudes.addActionListener(e -> {
             new SolicitudesFrame(usuarioActual).setVisible(true);
             dispose();
@@ -174,7 +169,6 @@ public class EstudiosFrame extends JFrame {
             new ReportesFrame(usuarioActual).setVisible(true);
             dispose();
         });
-        // TODO: btnReportes cuando exista ese frame
 
         panel.add(btnEstudio);
         panel.add(btnSolicitudes);
@@ -215,7 +209,6 @@ public class EstudiosFrame extends JFrame {
         tabla.setFont(FUENTE_NORMAL);
         tabla.setForeground(COLOR_TEXTO);
 
-        // la descripcion se parte en varias lineas
         tabla.getColumnModel().getColumn(1).setCellRenderer(new AreaRenderer());
         int[] anchos = {150, 300, 90, 140};
         for (int i = 0; i < anchos.length; i++) {
@@ -253,9 +246,6 @@ public class EstudiosFrame extends JFrame {
         return boton;
     }
 
-    // ------------------------------------------------------------------
-    // Logica de pantalla
-    // ------------------------------------------------------------------
     private void cargarEstudios() {
         try {
             IEstudioNegocio estudioNegocio = FabricaNegocio.crearEstudioNegocio();
@@ -268,7 +258,7 @@ public class EstudiosFrame extends JFrame {
                 String muestra = est.getNombreTipoMuestra();
                 String parametro = String.join(", ", est.getNombresParametros());
 
-                datosParaTabla.add(new String[]{nombre, descripcion, muestra, parametro});
+                datosParaTabla.add(new String[]{nombre, descripcion, muestra, parametro, String.valueOf(est.getId())});
             }
             setEstudios(datosParaTabla);
 
@@ -278,9 +268,7 @@ public class EstudiosFrame extends JFrame {
         }
     }
 
-    /**
-     * Carga los estudios: {nombre, descripcion, muestra, parametro}.
-     */
+  
     public void setEstudios(List<String[]> estudios) {
         todos.clear();
         todos.addAll(estudios);
@@ -303,9 +291,7 @@ public class EstudiosFrame extends JFrame {
         cargando = false;
     }
 
-    /**
-     * Solo un estudio marcado a la vez; muestra su detalle abajo.
-     */
+
     private void alSeleccionar(int fila) {
         boolean marcado = (Boolean) modeloLista.getValueAt(fila, 0);
         cargando = true;
@@ -319,7 +305,7 @@ public class EstudiosFrame extends JFrame {
         modeloDetalle.setRowCount(0);
         seleccionado = marcado ? visibles.get(fila) : null;
         if (marcado) {
-            modeloDetalle.addRow(visibles.get(fila));
+           modeloDetalle.addRow(java.util.Arrays.copyOf(visibles.get(fila), 4));
         }
     }
 
@@ -329,13 +315,11 @@ public class EstudiosFrame extends JFrame {
                     "Sin seleccion", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        new EditarEstudioFrame(usuarioActual, seleccionado).setVisible(true);
+        new EditarEstudioFrame(usuarioActual, Integer.valueOf(seleccionado[4])).setVisible(true);
         dispose();
     }
 
-    // ------------------------------------------------------------------
-    // Renderer con texto en varias lineas
-    // ------------------------------------------------------------------
+   
     private static class AreaRenderer extends JTextArea implements TableCellRenderer {
 
         AreaRenderer() {

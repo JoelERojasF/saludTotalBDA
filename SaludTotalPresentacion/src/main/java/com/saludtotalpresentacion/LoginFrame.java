@@ -132,15 +132,12 @@ public class LoginFrame extends JFrame {
         btnRegistrar.addActionListener(e -> registrar());
         btnDatosMasivos.addActionListener(e -> insertarDatos());
 
-        // Enter en los campos inicia sesión
         txtNombre.addActionListener(e -> txtPassword.requestFocusInWindow());
         txtPassword.addActionListener(e -> iniciarSesion());
         getRootPane().setDefaultButton(btnIniciarSesion);
     }
 
-    // ------------------------------------------------------------------
-    // Acciones
-    // ------------------------------------------------------------------
+    
     private void iniciarSesion() {
         String nombre = txtNombre.getText().trim();
         String password = new String(txtPassword.getPassword());
@@ -165,8 +162,8 @@ public class LoginFrame extends JFrame {
     }
 
     private void registrar() {
-        new RegistrarAdminPresentacion().setVisible(true); // abre el otro frame
-        dispose();                            // cierra el login
+        new RegistrarAdminPresentacion().setVisible(true);  
+        dispose();                           
     }
     
     private void insertarDatos(){
@@ -178,9 +175,7 @@ public class LoginFrame extends JFrame {
         }
     }
 
-    // ------------------------------------------------------------------
-    // Componentes personalizados (bordes redondeados + placeholder)
-    // ------------------------------------------------------------------
+   
     private static void dibujarFondoYBorde(Graphics g, JTextComponent c) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

@@ -24,14 +24,10 @@ import static com.saludtotalpresentacion.LoginFrame.FUENTE;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.RenderingHints;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -60,7 +56,6 @@ public class ResultadosFrame extends JFrame {
 
     private final UsuarioDTO usuarioActual;
 
-    // Dependencias de Negocio
     private final SolicitudNegocio solicitudNegocio;
     private final ClienteNegocio clienteNegocio;
     private final DoctorNegocio doctorNegocio;
@@ -69,7 +64,6 @@ public class ResultadosFrame extends JFrame {
     private final RangoNegocio rangoNegocio;
     private final ResultadoNegocio resultadoNegocio;
 
-    // Cada fila visual contendrá: {SolicitudDTO, folio, paciente, doctor, estudio, ClienteDTO}
     private final List<Object[]> todas = new ArrayList<>();
     private final List<Object[]> visibles = new ArrayList<>();
     private SolicitudDTO solicitudSeleccionada;
@@ -83,7 +77,6 @@ public class ResultadosFrame extends JFrame {
     private final JLabel lblDoctor = new JLabel("", SwingConstants.CENTER);
     private final JLabel lblEstudio = new JLabel("", SwingConstants.CENTER);
 
-    // Lista de solicitudes con checkbox y columnas completas
     private final DefaultTableModel modeloLista = new DefaultTableModel(
             new Object[]{"Sel", "Folio", "Paciente", "Doctor", "Estudio"}, 0) {
         @Override
@@ -97,7 +90,6 @@ public class ResultadosFrame extends JFrame {
         }
     };
 
-    // Tabla de parametros: solo se pueden editar Resultado (1) y Observacion (4)
     private final DefaultTableModel modeloParametros = new DefaultTableModel(
             new Object[]{"Parametro", "Resultado", "Unidad", "Rango Normal", "Observacion"}, 0) {
         @Override
@@ -111,7 +103,6 @@ public class ResultadosFrame extends JFrame {
     public ResultadosFrame(UsuarioDTO usuario) {
         this.usuarioActual = usuario;
 
-        // Inicializar Negocios
         this.solicitudNegocio = new SolicitudNegocio();
         this.clienteNegocio = new ClienteNegocio();
         this.doctorNegocio = new DoctorNegocio();
@@ -153,7 +144,6 @@ public class ResultadosFrame extends JFrame {
         panelPrincipal.add(crearTablaParametros());
         panelPrincipal.add(Box.createVerticalGlue());
 
-
         JButton btnGuardar = crearBoton("Guardar Resultado");
         btnGuardar.addActionListener(e -> guardar());
 
@@ -169,9 +159,6 @@ public class ResultadosFrame extends JFrame {
         cargarDatos();
     }
 
-    // ------------------------------------------------------------------
-    // Construccion de la UI
-    // ------------------------------------------------------------------
     private JPanel crearBarraNavegacion() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 0));
         panel.setBackground(COLOR_FONDO);
@@ -237,20 +224,17 @@ public class ResultadosFrame extends JFrame {
         tabla.setFont(FUENTE_NORMAL);
         tabla.setForeground(COLOR_TEXTO);
 
-        // Configuramos la cabecera visible y estilizada para mostrar las columnas separadas
         tabla.getTableHeader().setFont(FUENTE_NORMAL);
         tabla.getTableHeader().setForeground(Color.GRAY);
         tabla.getTableHeader().setBackground(COLOR_FONDO);
         tabla.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         tabla.getTableHeader().setReorderingAllowed(false);
 
-        // Ajustamos anchos de columnas
-        tabla.getColumnModel().getColumn(0).setMaxWidth(40); // Sel
-        tabla.getColumnModel().getColumn(1).setPreferredWidth(100); // Folio
-        tabla.getColumnModel().getColumn(2).setPreferredWidth(230); // Paciente
-        tabla.getColumnModel().getColumn(3).setPreferredWidth(180); // Doctor
-        tabla.getColumnModel().getColumn(4).setPreferredWidth(200); // Estudio
-
+        tabla.getColumnModel().getColumn(0).setMaxWidth(40);
+        tabla.getColumnModel().getColumn(1).setPreferredWidth(100);
+        tabla.getColumnModel().getColumn(2).setPreferredWidth(230);
+        tabla.getColumnModel().getColumn(3).setPreferredWidth(180);
+        tabla.getColumnModel().getColumn(4).setPreferredWidth(200);
         modeloLista.addTableModelListener(e -> {
             if (cargando) {
                 return;
@@ -332,23 +316,16 @@ public class ResultadosFrame extends JFrame {
         return boton;
     }
 
-    // ------------------------------------------------------------------
-    // Logica de base de datos
-    // ------------------------------------------------------------------
     private void cargarDatos() {
         try {
-            // Solo mostrar solicitudes que NO tengan resultados aún (pendientes)
             todas.clear();
             List<SolicitudDTO> pendientes = solicitudNegocio.obtenerTodosPendientes();
 
-            
             for (SolicitudDTO sol : pendientes) {
-                // Filtrar canceladas si es necesario (asumimos que obtenerTodosPendientes no trae canceladas)
                 if (sol.getCancelada()) {
                     continue;
                 }
 
-                // Consulta bajo demanda en la BD por cada ID asociado a la solicitud
                 ClienteDTO cli = clienteNegocio.buscarPorId(sol.getIdCliente());
                 DoctorDTO doc = sol.getIdDoctor() != null ? doctorNegocio.buscarPorId(sol.getIdDoctor()) : null;
                 EstudioDTO est = estudioNegocio.buscarPorId(sol.getIdEstudio());
@@ -381,7 +358,6 @@ public class ResultadosFrame extends JFrame {
             String paciente = s[2].toString().toLowerCase();
             if (folio.contains(texto) || paciente.contains(texto)) {
                 visibles.add(s);
-                // Las columnas son: "Sel", "Folio", "Paciente", "Doctor", "Estudio"
                 modeloLista.addRow(new Object[]{false, s[1], s[2], s[3], s[4]});
             }
         }
@@ -415,7 +391,6 @@ public class ResultadosFrame extends JFrame {
             parametrosSeleccionados.clear();
 
             try {
-                // Obtener parámetros y rangos de la BD solo al seleccionar el estudio específico
                 List<ParametroDTO> todosParametrosBD = parametroNegocio.obtenerTodos();
                 List<RangoDTO> todosRangosBD = rangoNegocio.obtenerTodos();
 
@@ -430,7 +405,7 @@ public class ResultadosFrame extends JFrame {
                                 if (r.getIdParametro().equals(p.getId()) && r.getEdadInicio() <= calcularEdad(cli != null ? cli.getFechaNacimiento() : "") && r.getEdadFin() >= calcularEdad(cli != null ? cli.getFechaNacimiento() : "")) {
                                     unidad = p.getUnidadMedida();
                                     rangoStr = r.getInicio() + " - " + r.getFin();
-                                    break; // Solo tomamos el primero de forma visual
+                                    break;
                                 }
                             }
                         }
@@ -487,28 +462,26 @@ public class ResultadosFrame extends JFrame {
         try {
             for (int i = 0; i < parametrosSeleccionados.size(); i++) {
                 ParametroDTO param = parametrosSeleccionados.get(i);
-                
-                
+
                 String resStr = String.valueOf(modeloParametros.getValueAt(i, 1)).trim();
-                if(resStr.isBlank() || resStr.equalsIgnoreCase("Ingrese el resultado")){
+                if (resStr.isBlank() || resStr.equalsIgnoreCase("Ingrese el resultado")) {
                     JOptionPane.showMessageDialog(this, "ingrese un resultado.",
                             "Error de validación", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                
+
                 String obsStr = String.valueOf(modeloParametros.getValueAt(i, 4)).trim();
-                if(resStr.isBlank() || resStr.equalsIgnoreCase("Ingrese la Observacion")){
+                if (resStr.isBlank() || resStr.equalsIgnoreCase("Ingrese la Observacion")) {
                     JOptionPane.showMessageDialog(this, "ingrese una observacion.",
                             "Error de validación", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                
+
                 CrearResultadoDTO dto = new CrearResultadoDTO(resStr, obsStr, solicitudSeleccionada.getId(), param.getId());
                 resultadoNegocio.registrar(dto);
             }
             JOptionPane.showMessageDialog(this, "Resultado guardado correctamente.");
 
-            // Actualizamos la lista, la base de datos y limpiamos la pantalla
             limpiar();
             todas.clear();
             cargarDatos();
@@ -519,9 +492,6 @@ public class ResultadosFrame extends JFrame {
         }
     }
 
-    // ------------------------------------------------------------------
-    // Utilidades
-    // ------------------------------------------------------------------
     private Integer calcularEdad(String fechaNacimiento) {
         if (fechaNacimiento == null || fechaNacimiento.isBlank()) {
             return null;
@@ -534,33 +504,4 @@ public class ResultadosFrame extends JFrame {
         }
     }
 
-    // ------------------------------------------------------------------
-    // Boton claro redondeado (Cancelar)
-    // ------------------------------------------------------------------
-    private static class BotonClaro extends JButton {
-
-        BotonClaro(String texto) {
-            super(texto);
-            setFont(new Font(FUENTE, Font.PLAIN, 14));
-            setForeground(COLOR_TEXTO);
-            setContentAreaFilled(false);
-            setBorderPainted(false);
-            setFocusPainted(false);
-            setOpaque(false);
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            setPreferredSize(new Dimension(150, 40));
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(Color.WHITE);
-            g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 14, 14);
-            g2.setColor(COLOR_TEXTO);
-            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 14, 14);
-            g2.dispose();
-            super.paintComponent(g);
-        }
-    }
 }

@@ -151,13 +151,26 @@ public class SolicitudNegocio implements ISolicitudNegocio {
     public List<SolicitudDTO> obtenerTodosPendientes() throws NegocioException {
         try {
             List<SolicitudDTO> lista = new ArrayList<>();
+            Daos.Interfaces.IResultadoDAO resultadoDAO = new Daos.ResultadoDAO(new Conexion.ConexionBD());
+            List<Entidades.ResultadoEntidad> todosLosResultados = resultadoDAO.obtenerTodos();
+
             for (SolicitudEntidad e : solicitudDAO.obtenerTodos()) {
-                if (e.getResultados().isEmpty() && e.getCancelada() == false) {
-                    lista.add(EntidadADTO(e));
+                if (!e.getCancelada()) {
+                    boolean tieneResultado = false;
+                    for (Entidades.ResultadoEntidad res : todosLosResultados) {
+                        if (res.getSolicitud().getId().equals(e.getId())) {
+                            tieneResultado = true;
+                            break;
+                        }
+                    }
+
+                    if (!tieneResultado) {
+                        lista.add(EntidadADTO(e));
+                    }
                 }
             }
             return lista;
-        } catch (PersistenciaException e) {
+        } catch (exception.PersistenciaException e) {
             throw new NegocioException("No se pudo obtener la lista de solicitudes pendientes de resultados.", e);
         }
     }
@@ -178,15 +191,15 @@ public class SolicitudNegocio implements ISolicitudNegocio {
     }
 
     private SolicitudDTO EntidadADTO(SolicitudEntidad e) {
-        if(e.getDoctor() == null){
-        return new SolicitudDTO(
-                e.getId(),
-                e.getFolio(),
-                e.getFechaHoraGeneracion().toString(),
-                e.getCancelada(),
-                e.getCliente().getId(),
-                null,
-                e.getEstudio().getId());
+        if (e.getDoctor() == null) {
+            return new SolicitudDTO(
+                    e.getId(),
+                    e.getFolio(),
+                    e.getFechaHoraGeneracion().toString(),
+                    e.getCancelada(),
+                    e.getCliente().getId(),
+                    null,
+                    e.getEstudio().getId());
         }
         return new SolicitudDTO(
                 e.getId(),
@@ -199,7 +212,7 @@ public class SolicitudNegocio implements ISolicitudNegocio {
     }
 
     private SolicitudEntidad DTOAEntidad(SolicitudDTO dto) throws PersistenciaException {
-        if(dto.getIdDoctor() == null){
+        if (dto.getIdDoctor() == null) {
             SolicitudEntidad creado = new SolicitudEntidad(
                     dto.getFolio(),
                     Timestamp.valueOf(dto.getFechaHoraGeneracion()),
@@ -209,7 +222,7 @@ public class SolicitudNegocio implements ISolicitudNegocio {
                     estudioDAO.buscarPorId(dto.getIdEstudio()));
             creado.setId(dto.getId());
             return creado;
-        }else{
+        } else {
             SolicitudEntidad creado = new SolicitudEntidad(
                     dto.getFolio(),
                     Timestamp.valueOf(dto.getFechaHoraGeneracion()),
@@ -219,11 +232,11 @@ public class SolicitudNegocio implements ISolicitudNegocio {
                     estudioDAO.buscarPorId(dto.getIdEstudio()));
             creado.setId(dto.getId());
             return creado;
-        }   
+        }
     }
 
     private SolicitudEntidad DTOAEntidad(CrearSolicitudDTO dto) throws PersistenciaException {
-        if(dto.getIdDoctor() == null){
+        if (dto.getIdDoctor() == null) {
             return new SolicitudEntidad(
                     dto.getFolio(),
                     Timestamp.valueOf(dto.getFechaHoraGeneracion()),
@@ -232,7 +245,7 @@ public class SolicitudNegocio implements ISolicitudNegocio {
                     null,
                     estudioDAO.buscarPorId(dto.getIdEstudio()));
         }
-        
+
         return new SolicitudEntidad(
                 dto.getFolio(),
                 Timestamp.valueOf(dto.getFechaHoraGeneracion()),

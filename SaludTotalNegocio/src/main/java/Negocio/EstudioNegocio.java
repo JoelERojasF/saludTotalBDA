@@ -9,6 +9,8 @@ import DTO.Crear.CrearEstudioDTO;
 import DTO.Crear.CrearParametroDTO;
 import DTO.Crear.CrearRangoDTO;
 import DTO.EstudioDTO;
+import DTO.ParametroDTO;
+import DTO.RangoDTO;
 import Daos.EstudioDAO;
 import Daos.Interfaces.IEstudioDAO;
 import Daos.Interfaces.ITipoMuestraDAO;
@@ -89,7 +91,7 @@ public class EstudioNegocio implements IEstudioNegocio {
 
             return EntidadADTO(estudioDAO.guardarCompleto(estudio, entidadesParametro));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo registrar el estudio con sus parametros. No se guardo nada por: "+ e.getMessage(), e);
+            throw new NegocioException("No se pudo registrar el estudio con sus parametros. No se guardo nada por: " + e.getMessage(), e);
         }
     }
 
@@ -108,7 +110,7 @@ public class EstudioNegocio implements IEstudioNegocio {
             entidad.setId(dto.getId());
             return EntidadADTO(estudioDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar el estudio por: "+ e.getMessage(), e);
+            throw new NegocioException("No se pudo actualizar el estudio por: " + e.getMessage(), e);
         }
     }
 
@@ -126,7 +128,7 @@ public class EstudioNegocio implements IEstudioNegocio {
             }
             estudioDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el estudio por: "+ e.getMessage(), e);
+            throw new NegocioException("No se pudo eliminar el estudio por: " + e.getMessage(), e);
         }
     }
 
@@ -145,7 +147,7 @@ public class EstudioNegocio implements IEstudioNegocio {
             }
             return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo consultar el estudio por: "+ e.getMessage(), e);
+            throw new NegocioException("No se pudo consultar el estudio por: " + e.getMessage(), e);
         }
     }
 
@@ -158,7 +160,7 @@ public class EstudioNegocio implements IEstudioNegocio {
             }
             return lista;
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo obtener la lista de estudios por: "+ e.getMessage(), e);
+            throw new NegocioException("No se pudo obtener la lista de estudios por: " + e.getMessage(), e);
         }
     }
 
@@ -280,5 +282,102 @@ public class EstudioNegocio implements IEstudioNegocio {
                 dto.getNombre(),
                 dto.getDescripcion(),
                 tipoMuestraDAO.buscarPorId(dto.getIdTipoMuestra()));
+    }
+
+    @Override
+    public EstudioDTO obtenerCompleto(Integer id) throws NegocioException {
+        if (id == null || id <= 0) {
+            throw new NegocioException("El id del estudio es invalido.");
+        }
+        try {
+            EstudioEntidad e = estudioDAO.buscarCompletoPorId(id);
+            if (e == null) {
+                throw new NegocioException("No se encontro el estudio.");
+            }
+            EstudioDTO dto = EntidadADTO(e);
+            if (e.getParametros() != null) {
+                e.getParametros().stream()
+                        .sorted(java.util.Comparator.comparing(ParametroEntidad::getOrdenAparicion))
+                        .forEach(p -> {
+                            ParametroDTO pd = new ParametroDTO(p.getId(), p.getNombre(), p.getDescripcion(),
+                                    p.getOrdenAparicion(), p.getUnidadMedida(), p.getNumerico(), e.getId());
+                            if (p.getRangos() != null) {
+                                p.getRangos().stream()
+                                        .sorted(java.util.Comparator.comparing(RangoEntidad::getEdadInicio))
+                                        .forEach(r -> pd.getRangos().add(new RangoDTO(r.getId(), r.getInicio(),
+                                        r.getFin(), r.getEdadInicio(), r.getEdadFin(), p.getId())));
+                            }
+                            dto.getParametros().add(pd);
+                        });
+            }
+            return dto;
+        } catch (PersistenciaException ex) {
+            throw new NegocioException("No se pudo consultar el estudio por: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public EstudioDTO actualizarCompleto(EstudioDTO dto) throws NegocioException {
+        if (dto == null || dto.getId() == null) {
+            throw new NegocioException("Falta el id del estudio a actualizar.");
+        }
+        if (dto.getIdTipoMuestra() == null) {
+            throw new NegocioException("Falta el tipo de muestra del estudio.");
+        }
+        validar(dto.getNombre(), dto.getDescripcion(), dto.getIdTipoMuestra());
+
+        List<ParametroDTO> params = dto.getParametros();
+        if (params == null || params.isEmpty()) {
+            throw new NegocioException("El estudio debe tener al menos un parametro.");
+        }
+
+        List<CrearParametroDTO> paraValidar = new ArrayList<>();
+        java.util.Set<Integer> ordenes = new java.util.HashSet<>();
+        for (ParametroDTO p : params) {
+            if (p == null) {
+                throw new NegocioException("Hay un parametro sin datos.");
+            }
+            CrearParametroDTO c = new CrearParametroDTO(p.getNombre(), p.getDescripcion(),
+                    p.getOrdenAparicion(), p.getUnidadMedida(), p.getNumerico(), dto.getId());
+            List<CrearRangoDTO> rangos = new ArrayList<>();
+            if (p.getRangos() != null) {
+                for (RangoDTO r : p.getRangos()) {
+                    rangos.add(new CrearRangoDTO(r.getInicio(), r.getFin(),
+                            r.getEdadInicio(), r.getEdadFin(), null));
+                }
+            }
+            c.setRangos(rangos);
+            paraValidar.add(c);
+            if (p.getOrdenAparicion() != null && !ordenes.add(p.getOrdenAparicion())) {
+                throw new NegocioException("El orden de aparicion " + p.getOrdenAparicion() + " esta repetido.");
+            }
+        }
+        validarParametros(paraValidar);
+
+        try {
+            if (estudioDAO.buscarPorId(dto.getId()) == null) {
+                throw new NegocioException("El estudio que intentas actualizar no existe.");
+            }
+            TipoMuestraEntidad tipoMuestra = tipoMuestraDAO.buscarPorId(dto.getIdTipoMuestra());
+            if (tipoMuestra == null) {
+                throw new NegocioException("El tipo de muestra seleccionado no existe.");
+            }
+
+            EstudioEntidad estudio = new EstudioEntidad(
+                    dto.getNombre().trim(), dto.getDescripcion().trim(), tipoMuestra);
+            estudio.setId(dto.getId());
+
+            List<ParametroEntidad> entidades = new ArrayList<>();
+            for (int i = 0; i < paraValidar.size(); i++) {
+                ParametroEntidad pe = parametroAEntidad(paraValidar.get(i));
+                pe.setId(params.get(i).getId());   
+                entidades.add(pe);
+            }
+
+            estudioDAO.actualizarCompleto(estudio, entidades);
+            return obtenerCompleto(dto.getId());
+        } catch (PersistenciaException e) {
+            throw new NegocioException("No se pudo actualizar el estudio: " + e.getMessage(), e);
+        }
     }
 }

@@ -4,12 +4,15 @@
  */
 package DTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author le0jx
  */
 public class ParametroDTO {
-    
+
     private Integer id;
     private String nombre;
     private String descripcion;
@@ -17,6 +20,8 @@ public class ParametroDTO {
     private String unidadMedida;
     private Boolean numerico;
     private Integer idEstudio;
+
+    private List<RangoDTO> rangos = new ArrayList<>();
 
     public ParametroDTO(Integer id, String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, Boolean numerico, Integer idEstudio) {
         this.id = id;
@@ -26,6 +31,14 @@ public class ParametroDTO {
         this.unidadMedida = unidadMedida;
         this.numerico = numerico;
         this.idEstudio = idEstudio;
+    }
+
+    public List<RangoDTO> getRangos() {
+        return rangos;
+    }
+
+    public void setRangos(List<RangoDTO> rangos) {
+        this.rangos = rangos;
     }
 
     public Integer getId() {
@@ -88,5 +101,5 @@ public class ParametroDTO {
     public String toString() {
         return "ParametroDTO{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", numerico=" + numerico + ", idEstudio=" + idEstudio + '}';
     }
-    
+
 }

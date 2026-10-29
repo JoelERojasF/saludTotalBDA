@@ -14,6 +14,7 @@ import java.util.List;
  * @author le0jx
  */
 public interface IEstudioNegocio {
+
     EstudioDTO registrar(CrearEstudioDTO dto) throws NegocioException;
 
     EstudioDTO registrarCompleto(CrearEstudioDTO dto) throws NegocioException;
@@ -25,4 +26,9 @@ public interface IEstudioNegocio {
     EstudioDTO buscarPorId(Integer id) throws NegocioException;
 
     List<EstudioDTO> obtenerTodos() throws NegocioException;
+
+    EstudioDTO obtenerCompleto(Integer id) throws NegocioException;
+
+    EstudioDTO actualizarCompleto(EstudioDTO dto) throws NegocioException;
+
 }

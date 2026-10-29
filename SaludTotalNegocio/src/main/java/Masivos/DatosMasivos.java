@@ -4,17 +4,11 @@
  */
 package Masivos;
 
-import Conexion.ConexionBD;
 import DTO.Crear.CrearClienteDTO;
 import DTO.Crear.CrearDoctorDTO;
 import DTO.Crear.CrearEmpresaDTO;
 import DTO.Crear.CrearTipoMuestraDTO;
 import DTO.Crear.CrearUsuarioDTO;
-import Daos.ClienteDAO;
-import Daos.DoctorDAO;
-import Daos.EmpresaDAO;
-import Daos.TipoMuestraDAO;
-import Daos.UsuarioDAO;
 import Exception.NegocioException;
 import Negocio.ClienteNegocio;
 import Negocio.DoctorNegocio;

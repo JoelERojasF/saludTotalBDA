@@ -42,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -54,21 +55,21 @@ public class RegistrarEstudioFrame extends JFrame {
 
     private final UsuarioDTO usuarioActual;
 
-    // Capa de negocio (solo a traves de sus interfaces y la fabrica)
     private final IEstudioNegocio estudioNegocio;
     private final ITipoMuestraNegocio tipoMuestraNegocio;
 
-    // Tipos de muestra cargados desde la BD (el indice del combo - 1 apunta a esta lista)
     private List<TipoMuestraDTO> tiposMuestra = new ArrayList<>();
 
-    // Parametros (con sus rangos) capturados; se envian a negocio al guardar
     private final List<CrearParametroDTO> parametros = new ArrayList<>();
+    private final List<Integer> filaAParametro = new ArrayList<>();
 
     protected final CampoTexto txtNombre = new CampoTexto("ej.Biometria hematica");
     protected final JComboBox<String> cmbMuestra = new JComboBox<>(new String[]{TEXTO_SELECCION});
     protected JTextArea txtNota;
     protected final JLabel lblTitulo = new JLabel("Nuevo estudio");
     protected String mensajeExito = "Estudio guardado correctamente.";
+
+    private JTable tablaParametros;
 
     protected final DefaultTableModel modeloParametros = new DefaultTableModel(
             new Object[]{"Orden", "Nombre", "Unidad", "Rango", "Edad", "Descripcion"}, 0) {
@@ -109,9 +110,7 @@ public class RegistrarEstudioFrame extends JFrame {
         panelPrincipal.add(crearSeccionNota());
         panelPrincipal.add(Box.createVerticalStrut(25));
 
-        JButton btnAgregarParametro = crearBoton("Agregar parametro");
-        btnAgregarParametro.addActionListener(e -> agregarParametro());
-        panelPrincipal.add(crearFilaDerecha(btnAgregarParametro));
+        panelPrincipal.add(crearFilaBotonesParametros());
         panelPrincipal.add(Box.createVerticalStrut(10));
 
         panelPrincipal.add(crearTablaParametros());
@@ -122,8 +121,11 @@ public class RegistrarEstudioFrame extends JFrame {
         btnCancelar.addActionListener(e -> volver());
         btnGuardar.addActionListener(e -> guardar());
 
-        JPanel panelBotones = crearFilaDerecha(btnCancelar);
-        panelBotones.setLayout(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
+        panelBotones.setBackground(COLOR_FONDO);
+        panelBotones.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panelBotones.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        panelBotones.add(btnCancelar);
         panelBotones.add(btnGuardar);
         panelPrincipal.add(panelBotones);
 
@@ -132,9 +134,6 @@ public class RegistrarEstudioFrame extends JFrame {
         cargarTiposMuestra();
     }
 
-    // ------------------------------------------------------------------
-    // Construccion de la UI
-    // ------------------------------------------------------------------
     private JPanel crearBarraNavegacion() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 0));
         panel.setBackground(COLOR_FONDO);
@@ -159,7 +158,6 @@ public class RegistrarEstudioFrame extends JFrame {
             new ReportesFrame(usuarioActual).setVisible(true);
             dispose();
         });
-        // TODO: btnReportes cuando exista ese frame
 
         panel.add(btnEstudio);
         panel.add(btnSolicitudes);
@@ -214,7 +212,6 @@ public class RegistrarEstudioFrame extends JFrame {
         lbl.setForeground(COLOR_TEXTO);
         lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // JTextArea con placeholder "Nota"
         txtNota = new JTextArea(4, 20) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -258,41 +255,53 @@ public class RegistrarEstudioFrame extends JFrame {
         return panel;
     }
 
+    private JPanel crearFilaBotonesParametros() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        panel.setBackground(COLOR_FONDO);
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+
+        JButton btnAgregar = crearBoton("Agregar parametro");
+        JButton btnEditar = crearBoton("Editar parametro");
+        JButton btnEliminar = crearBoton("Eliminar parametro");
+
+        btnAgregar.addActionListener(e -> agregarParametro());
+        btnEditar.addActionListener(e -> editarParametro());
+        btnEliminar.addActionListener(e -> eliminarParametro());
+
+        panel.add(btnAgregar);
+        panel.add(btnEditar);
+        panel.add(btnEliminar);
+        return panel;
+    }
+
     private JScrollPane crearTablaParametros() {
-        JTable tabla = new JTable(modeloParametros);
-        tabla.setRowHeight(28);
-        tabla.setShowGrid(false);
-        tabla.setBackground(COLOR_FONDO);
-        tabla.setFont(FUENTE_NORMAL);
-        tabla.setForeground(COLOR_TEXTO);
+        tablaParametros = new JTable(modeloParametros);
+        tablaParametros.setRowHeight(28);
+        tablaParametros.setShowGrid(false);
+        tablaParametros.setBackground(COLOR_FONDO);
+        tablaParametros.setFont(FUENTE_NORMAL);
+        tablaParametros.setForeground(COLOR_TEXTO);
+        tablaParametros.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         int[] anchos = {60, 150, 80, 100, 80, 250};
         for (int i = 0; i < anchos.length; i++) {
-            tabla.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+            tablaParametros.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
         }
 
-        tabla.getTableHeader().setFont(FUENTE_NORMAL);
-        tabla.getTableHeader().setForeground(Color.GRAY);
-        tabla.getTableHeader().setBackground(COLOR_FONDO);
-        tabla.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
-        tabla.getTableHeader().setReorderingAllowed(false);
+        tablaParametros.getTableHeader().setFont(FUENTE_NORMAL);
+        tablaParametros.getTableHeader().setForeground(Color.GRAY);
+        tablaParametros.getTableHeader().setBackground(COLOR_FONDO);
+        tablaParametros.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        tablaParametros.getTableHeader().setReorderingAllowed(false);
 
-        JScrollPane scroll = new JScrollPane(tabla);
+        JScrollPane scroll = new JScrollPane(tablaParametros);
         scroll.setAlignmentX(Component.LEFT_ALIGNMENT);
         scroll.setPreferredSize(new Dimension(830, 150));
         scroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
         scroll.getViewport().setBackground(COLOR_FONDO);
         scroll.setBorder(BorderFactory.createEmptyBorder());
         return scroll;
-    }
-
-    private JPanel crearFilaDerecha(Component boton) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        panel.setBackground(COLOR_FONDO);
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-        panel.add(boton);
-        return panel;
     }
 
     private JButton crearBoton(String texto) {
@@ -302,9 +311,6 @@ public class RegistrarEstudioFrame extends JFrame {
         return boton;
     }
 
-    // ------------------------------------------------------------------
-    // Datos desde la capa de negocio
-    // ------------------------------------------------------------------
     private void cargarTiposMuestra() {
         try {
             tiposMuestra = tipoMuestraNegocio.obtenerTodos();
@@ -320,25 +326,85 @@ public class RegistrarEstudioFrame extends JFrame {
         }
     }
 
-    // ------------------------------------------------------------------
-    // Acciones
-    // ------------------------------------------------------------------
-    private void agregarParametro() {
-        // el orden sigue la cantidad de parametros, no de filas (un parametro puede tener varios rangos)
-        new RegistrarParametrosFrame(this, parametros.size() + 1, p -> {
-            parametros.add(p);
-            // una fila por cada rango registrado
-            for (CrearRangoDTO r : p.getRangos()) {
+    private void recargarTabla() {
+        modeloParametros.setRowCount(0);
+        filaAParametro.clear();
+        for (int i = 0; i < parametros.size(); i++) {
+            CrearParametroDTO p = parametros.get(i);
+            if (Boolean.TRUE.equals(p.getNumerico()) && !p.getRangos().isEmpty()) {
+                for (CrearRangoDTO r : p.getRangos()) {
+                    modeloParametros.addRow(new Object[]{
+                        p.getOrdenAparicion(), p.getNombre(), p.getUnidadMedida(),
+                        r.getInicio() + "-" + r.getFin(),
+                        r.getEdadInicio() + "-" + r.getEdadFin(),
+                        p.getDescripcion()
+                    });
+                    filaAParametro.add(i);
+                }
+            } else {
                 modeloParametros.addRow(new Object[]{
-                    p.getOrdenAparicion(),
-                    p.getNombre(),
-                    p.getUnidadMedida(),
-                    r.getInicio() + "-" + r.getFin(),
-                    r.getEdadInicio() + "-" + r.getEdadFin(),
-                    p.getDescripcion()
+                    p.getOrdenAparicion(), p.getNombre(), p.getUnidadMedida(),
+                    "-", "-", p.getDescripcion()
                 });
+                filaAParametro.add(i);
             }
+        }
+    }
+
+    private void agregarParametro() {
+        new RegistrarParametrosFrame(this, maxOrden() + 1, p -> {
+            parametros.add(p);
+            recargarTabla();
         }).setVisible(true);
+    }
+
+    private void editarParametro() {
+        int indice = indiceParametroSeleccionado();
+        if (indice < 0) {
+            JOptionPane.showMessageDialog(this, "Selecciona un parametro de la tabla para editarlo.",
+                    "Sin seleccion", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        CrearParametroDTO actual = parametros.get(indice);
+        new RegistrarParametrosFrame(this, actual.getOrdenAparicion(), actual, p -> {
+            parametros.set(indice, p);
+            recargarTabla();
+        }).setVisible(true);
+    }
+
+    private void eliminarParametro() {
+        int indice = indiceParametroSeleccionado();
+        if (indice < 0) {
+            JOptionPane.showMessageDialog(this, "Selecciona un parametro de la tabla para eliminarlo.",
+                    "Sin seleccion", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        CrearParametroDTO p = parametros.get(indice);
+        int confirmar = JOptionPane.showConfirmDialog(this,
+                "¿Eliminar el parametro '" + p.getNombre() + "'?",
+                "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirmar == JOptionPane.YES_OPTION) {
+            parametros.remove(indice);
+            recargarTabla();
+        }
+    }
+
+    private int indiceParametroSeleccionado() {
+        int fila = tablaParametros.getSelectedRow();
+        if (fila < 0 || fila >= filaAParametro.size()) {
+            return -1;
+        }
+        return filaAParametro.get(fila);
+    }
+
+    private int maxOrden() {
+        int max = 0;
+        for (CrearParametroDTO p : parametros) {
+            if (p.getOrdenAparicion() != null && p.getOrdenAparicion() > max) {
+                max = p.getOrdenAparicion();
+            }
+        }
+        return max;
     }
 
     private void guardar() {
@@ -384,9 +450,6 @@ public class RegistrarEstudioFrame extends JFrame {
         dispose();
     }
 
-    // ------------------------------------------------------------------
-    // Boton claro redondeado (Cancelar)
-    // ------------------------------------------------------------------
     private static class BotonClaro extends JButton {
 
         BotonClaro(String texto) {
@@ -413,5 +476,4 @@ public class RegistrarEstudioFrame extends JFrame {
             super.paintComponent(g);
         }
     }
-
 }

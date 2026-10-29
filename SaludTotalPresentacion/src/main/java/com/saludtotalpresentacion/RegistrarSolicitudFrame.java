@@ -46,6 +46,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -78,8 +79,8 @@ public class RegistrarSolicitudFrame extends JFrame {
     private CampoTexto txtBuscarEstudio;
     private JComboBox<String> cmbCliente;
     private JComboBox<String> cmbDoctor;
-    private JLabel lblInfoCliente;
-    private JLabel lblInfoDoctor;
+    private JTextArea lblInfoCliente;
+    private JTextArea lblInfoDoctor;
     private JRadioButton rbCuentaPropia;
     private JRadioButton rbDoctorSolicita;
 
@@ -209,7 +210,6 @@ public class RegistrarSolicitudFrame extends JFrame {
             new ReportesFrame(usuarioActual).setVisible(true);
             dispose();
         });
-        // ReportesFrame.addActionListener
 
         panel.add(btnEstudios);
         panel.add(btnSolicitudes);
@@ -258,6 +258,8 @@ public class RegistrarSolicitudFrame extends JFrame {
         cmbCliente.setPreferredSize(new Dimension(0, 35));
         cmbCliente.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        lblInfoCliente = crearAreaInfoTexto();
+
         cmbCliente.addActionListener(e -> {
             int index = cmbCliente.getSelectedIndex();
             if (index > 0 && index - 1 < listaClientes.size()) {
@@ -266,18 +268,16 @@ public class RegistrarSolicitudFrame extends JFrame {
                 String fechaVal = clienteSeleccionado.getFechaNacimiento() != null ? clienteSeleccionado.getFechaNacimiento() : "";
                 String sangreVal = clienteSeleccionado.getTipoSangre() != null ? clienteSeleccionado.getTipoSangre() : "";
 
-                lblInfoCliente.setText("<html>nombre completo: " + nombreCompletoCliente(clienteSeleccionado)
-                        + "<br>sexo: " + sexoVal
-                        + "<br>fecha de nacimiento: " + fechaVal
-                        + "<br>tipo de sangre: " + sangreVal + "</html>");
+                lblInfoCliente.setText("nombre completo: " + nombreCompletoCliente(clienteSeleccionado) + "\n"
+                        + "sexo: " + sexoVal + "\n"
+                        + "fecha de nacimiento: " + fechaVal + "\n"
+                        + "tipo de sangre: " + sangreVal);
             } else {
-                lblInfoCliente.setText("<html>nombre completo: <br>sexo: <br>fecha de nacimiento: <br>tipo de sangre: </html>");
+                lblInfoCliente.setText("nombre completo: \nsexo: \nfecha de nacimiento: \ntipo de sangre: ");
             }
         });
 
-        lblInfoCliente = new JLabel("<html>nombre completo: <br>sexo: <br>fecha de nacimiento: <br>tipo de sangre: </html>");
-        lblInfoCliente.setForeground(COLOR_TEXTO);
-        lblInfoCliente.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblInfoCliente.setText("nombre completo: \nsexo: \nfecha de nacimiento: \ntipo de sangre: ");
 
         JButton btnRegistrarCliente = crearBotonOscuro("Registrar cliente");
         btnRegistrarCliente.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -340,21 +340,21 @@ public class RegistrarSolicitudFrame extends JFrame {
         cmbDoctor.setPreferredSize(new Dimension(0, 35));
         cmbDoctor.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        lblInfoDoctor = crearAreaInfoTexto();
+
         cmbDoctor.addActionListener(e -> {
             int index = cmbDoctor.getSelectedIndex();
             if (index > 0 && index - 1 < listaDoctores.size()) {
                 DoctorDTO doctorSeleccionado = listaDoctores.get(index - 1);
                 String sexoVal = doctorSeleccionado.getSexo() != null ? doctorSeleccionado.getSexo() : "";
-                lblInfoDoctor.setText("<html>nombre completo: DR. " + nombreCompletoDoctor(doctorSeleccionado)
-                        + "<br>sexo: " + sexoVal + "</html>");
+                lblInfoDoctor.setText("nombre completo: DR. " + nombreCompletoDoctor(doctorSeleccionado) + "\n"
+                        + "sexo: " + sexoVal);
             } else {
-                lblInfoDoctor.setText("<html>nombre completo: <br>sexo: </html>");
+                lblInfoDoctor.setText("nombre completo: \nsexo: ");
             }
         });
 
-        lblInfoDoctor = new JLabel("<html>nombre completo: <br>sexo: </html>");
-        lblInfoDoctor.setForeground(COLOR_TEXTO);
-        lblInfoDoctor.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblInfoDoctor.setText("nombre completo: \nsexo: ");
 
         pnlDoctor.add(pnlRadios);
         pnlDoctor.add(Box.createVerticalStrut(5));
@@ -381,13 +381,26 @@ public class RegistrarSolicitudFrame extends JFrame {
         return panel;
     }
 
+    private JTextArea crearAreaInfoTexto() {
+        JTextArea area = new JTextArea();
+        area.setBackground(COLOR_FONDO);
+        area.setForeground(COLOR_TEXTO);
+        area.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        area.setEditable(false);
+        area.setFocusable(false);
+        area.setOpaque(true);
+        area.setBorder(null);
+        area.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return area;
+    }
+
     private void actualizarEstadoDoctor() {
         boolean esDoctorSolicita = rbDoctorSolicita.isSelected();
         cmbDoctor.setEnabled(esDoctorSolicita);
         lblInfoDoctor.setEnabled(esDoctorSolicita);
         if (!esDoctorSolicita) {
             cmbDoctor.setSelectedIndex(0);
-            lblInfoDoctor.setText("<html>nombre completo: <br>sexo: </html>");
+            lblInfoDoctor.setText("nombre completo: \nsexo: ");
         }
     }
 

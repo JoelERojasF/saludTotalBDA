@@ -38,12 +38,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-
-public class RegistrarParametrosFrame extends JFrame{
+public class RegistrarParametrosFrame extends JFrame {
 
     private final Font FUENTE_ETIQUETA = new Font(FUENTE, Font.PLAIN, 16);
 
-    // Entrega al frame padre el parametro ya armado como DTO de la capa de negocio
     private final Consumer<CrearParametroDTO> alRegistrar;
 
     private final CampoTexto txtNombre = new CampoTexto("nombre");
@@ -55,10 +53,14 @@ public class RegistrarParametrosFrame extends JFrame{
     JButton btnRegistrar = new BotonRedondeado("Registrar");
     JButton btnRegistrarRango = new BotonGris("Registrar Rango");
 
-    // Rangos capturados; el idParametro queda en null: lo asigna la capa de negocio al guardar
     private final List<CrearRangoDTO> rangos = new ArrayList<>();
 
     public RegistrarParametrosFrame(JFrame padre, int siguienteOrden, Consumer<CrearParametroDTO> alRegistrar) {
+        this(padre, siguienteOrden, null, alRegistrar);
+    }
+
+    public RegistrarParametrosFrame(JFrame padre, int siguienteOrden, CrearParametroDTO existente,
+            Consumer<CrearParametroDTO> alRegistrar) {
         this.alRegistrar = alRegistrar;
 
         setTitle("Salud Total - Agregar parametro");
@@ -66,10 +68,7 @@ public class RegistrarParametrosFrame extends JFrame{
         setMinimumSize(new Dimension(360, 540));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(padre);
-        
-        
 
-        // el padre se deshabilita mientras este frame esta abierto
         padre.setEnabled(false);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -104,7 +103,6 @@ public class RegistrarParametrosFrame extends JFrame{
         panel.add(crearCuadroRango());
         panel.add(Box.createVerticalStrut(8));
 
-
         configurarBoton(btnRegistrar);
         configurarBoton(btnRegistrarRango);
 
@@ -114,15 +112,15 @@ public class RegistrarParametrosFrame extends JFrame{
 
         btnRegistrar.addActionListener(e -> registrar());
         btnRegistrarRango.addActionListener(e -> registrarRango());
-        
-        
 
         setContentPane(panel);
+
+        if (existente != null) {
+            precargar(existente);
+        }
     }
 
-    // ------------------------------------------------------------------
-    // Construccion de la UI
-    // ------------------------------------------------------------------
+    
     private JLabel crearEtiqueta(String texto) {
         JLabel lbl = new JLabel(texto);
         lbl.setFont(FUENTE_ETIQUETA);
@@ -168,9 +166,7 @@ public class RegistrarParametrosFrame extends JFrame{
         boton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
     }
 
-    // ------------------------------------------------------------------
-    // Acciones
-    // ------------------------------------------------------------------
+
     private void registrarRango() {
         JTextField txtMin = new JTextField();
         JTextField txtMax = new JTextField();
@@ -193,7 +189,6 @@ public class RegistrarParametrosFrame extends JFrame{
             return;
         }
 
-        // Solo se valida el formato de captura; las reglas de negocio las valida la capa de negocio
         double vMin;
         double vMax;
         int eMin;
@@ -238,18 +233,15 @@ public class RegistrarParametrosFrame extends JFrame{
             return;
         }
 
-        rangos.add(new CrearRangoDTO( vMin, vMax, eMin, eMax, null));
+        rangos.add(new CrearRangoDTO(vMin, vMax, eMin, eMax, null));
         txtRango.append(vMin + "  -  " + vMax + "  " + eMin + " - " + eMax + " años\n");
     }
-    
-   
 
     private void registrar() {
         String nombre = txtNombre.getText().trim();
         String descripcion = txtDescripcion.getText().trim();
         boolean numerico = chkNumerico.isSelected();
         String unidadMedida = txtUnidadMedida.getText().trim();
-        
 
         if (nombre.isEmpty() || descripcion.isEmpty() || (numerico && unidadMedida.isEmpty())) {
             JOptionPane.showMessageDialog(this, "El nombre, la descripcion y la unidad de medida son obligatorios.",
@@ -273,17 +265,13 @@ public class RegistrarParametrosFrame extends JFrame{
                     "Sin rangos", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
+
         List<CrearRangoDTO> rangosFinales = new ArrayList<>(rangos);
         if (!numerico) {
-            // rango "de relleno": valor 0 a 1, edad 0 a 1000
             rangosFinales.clear();
             rangosFinales.add(new CrearRangoDTO(0.0, 1.0, 0, 1000, null));
         }
 
-
-        // numerico = true porque cada parametro se define con rangos numericos;
-        // valorInicial / valorFinal quedan en null (columnas opcionales)
         CrearParametroDTO parametro = new CrearParametroDTO(
                 nombre, descripcion, orden, unidadMedida, numerico, null);
         parametro.setRangos(rangosFinales);
@@ -291,7 +279,7 @@ public class RegistrarParametrosFrame extends JFrame{
         alRegistrar.accept(parametro);
         dispose();
     }
-    
+
     private void alCambiarNumerico() {
         boolean numerico = chkNumerico.isSelected();
         txtUnidadMedida.setEnabled(numerico);
@@ -304,12 +292,7 @@ public class RegistrarParametrosFrame extends JFrame{
         }
     }
 
-    // ------------------------------------------------------------------
-    // Componentes personalizados
-    // ------------------------------------------------------------------
-    /**
-     * Panel blanco con borde redondeado (contenedor del cuadro de rangos).
-     */
+
     private static class CuadroRedondeado extends JPanel {
 
         CuadroRedondeado() {
@@ -399,6 +382,25 @@ public class RegistrarParametrosFrame extends JFrame{
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
             g2.dispose();
             super.paintComponent(g);
+        }
+    }
+
+    private void precargar(CrearParametroDTO e) {
+        txtNombre.setText(e.getNombre());
+        txtDescripcion.setText(e.getDescripcion());
+        txtOrden.setText(String.valueOf(e.getOrdenAparicion()));
+
+        boolean numerico = Boolean.TRUE.equals(e.getNumerico());
+        chkNumerico.setSelected(numerico);
+        alCambiarNumerico();                     
+        txtUnidadMedida.setText(e.getUnidadMedida() == null ? "" : e.getUnidadMedida());
+
+        if (numerico && e.getRangos() != null) {
+            for (CrearRangoDTO r : e.getRangos()) {
+                rangos.add(new CrearRangoDTO(r.getInicio(), r.getFin(), r.getEdadInicio(), r.getEdadFin(), null));
+                txtRango.append(r.getInicio() + "  -  " + r.getFin() + "  "
+                        + r.getEdadInicio() + " - " + r.getEdadFin() + " años\n");
+            }
         }
     }
 

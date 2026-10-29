@@ -20,6 +20,8 @@ public class EstudioDTO {
     private String nombreTipoMuestra;
     private List<String> nombresParametros = new ArrayList<>();
 
+        private List<ParametroDTO> parametros = new ArrayList<>();
+    
     public EstudioDTO(Integer id, String nombre, String descripcion, Integer idTipoMuestra) {
         this.id = id;
         this.nombre = nombre;
@@ -27,6 +29,16 @@ public class EstudioDTO {
         this.idTipoMuestra = idTipoMuestra;
     }
 
+    public List<ParametroDTO> getParametros() {
+        return parametros;
+    }
+
+    public void setParametros(List<ParametroDTO> parametros) {
+        this.parametros = parametros;
+    }
+
+    
+    
     public String getNombreTipoMuestra() {
         return nombreTipoMuestra;
     }
