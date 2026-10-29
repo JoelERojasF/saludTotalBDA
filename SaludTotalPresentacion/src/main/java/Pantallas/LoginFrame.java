@@ -1,7 +1,6 @@
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.UsuarioDTO;
-import Exception.NegocioException;
 import Masivos.DatosMasivos;
 import Negocio.Interfaces.IUsuarioNegocio;
 import Negocio.UsuarioNegocio;
@@ -72,7 +71,6 @@ public class LoginFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
 
-        // Título
         JLabel lblTitulo = new JLabel("Iniciar Sesion", SwingConstants.CENTER);
         lblTitulo.setFont(new Font(FUENTE, Font.PLAIN, 18));
         lblTitulo.setForeground(COLOR_TEXTO);
@@ -80,7 +78,6 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(0, 0, 50, 0);
         panel.add(lblTitulo, gbc);
 
-        // Nombre
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 8, 0);
         panel.add(crearEtiqueta("Nombre:"), gbc);
@@ -89,16 +86,14 @@ public class LoginFrame extends JFrame {
         gbc.insets = new Insets(0, 0, 40, 0);
         panel.add(txtNombre, gbc);
 
-        // Password
         gbc.gridy = 3;
         gbc.insets = new Insets(0, 0, 8, 0);
-        panel.add(crearEtiqueta("Password"), gbc);
+        panel.add(crearEtiqueta("Contraseña"), gbc);
 
         gbc.gridy = 4;
         gbc.insets = new Insets(0, 0, 0, 0);
         panel.add(txtPassword, gbc);
 
-        // Botones
         JPanel panelBotones = new JPanel(new GridBagLayout());
         panelBotones.setOpaque(false);
         GridBagConstraints b = new GridBagConstraints();

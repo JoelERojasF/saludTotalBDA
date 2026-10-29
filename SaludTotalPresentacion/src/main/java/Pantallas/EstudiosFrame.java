@@ -1,14 +1,14 @@
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.EstudioDTO;
 import DTO.UsuarioDTO;
 import Negocio.FabricaNegocio;
 import Negocio.Interfaces.IEstudioNegocio;
-import com.saludtotalpresentacion.LoginFrame.BotonRedondeado;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
-import com.saludtotalpresentacion.LoginFrame.CampoTexto;
-import static com.saludtotalpresentacion.LoginFrame.FUENTE;
+import Pantallas.LoginFrame.BotonRedondeado;
+import static Pantallas.LoginFrame.COLOR_FONDO;
+import static Pantallas.LoginFrame.COLOR_TEXTO;
+import Pantallas.LoginFrame.CampoTexto;
+import static Pantallas.LoginFrame.FUENTE;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;

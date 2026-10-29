@@ -1,23 +1,21 @@
-package com.saludtotalpresentacion;
+package Pantallas;
 
+import DTO.Crear.CrearEstudioDTO;
 import DTO.Crear.CrearParametroDTO;
 import DTO.Crear.CrearRangoDTO;
-import DTO.EstudioDTO;
-import DTO.ParametroDTO;
-import DTO.RangoDTO;
 import DTO.TipoMuestraDTO;
 import DTO.UsuarioDTO;
 import Exception.NegocioException;
 import Negocio.FabricaNegocio;
 import Negocio.Interfaces.IEstudioNegocio;
 import Negocio.Interfaces.ITipoMuestraNegocio;
-import com.saludtotalpresentacion.LoginFrame.BotonRedondeado;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_BORDE;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_PLACEHOLDER;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
-import com.saludtotalpresentacion.LoginFrame.CampoTexto;
-import static com.saludtotalpresentacion.LoginFrame.FUENTE;
+import Pantallas.LoginFrame.BotonRedondeado;
+import static Pantallas.LoginFrame.COLOR_BORDE;
+import static Pantallas.LoginFrame.COLOR_FONDO;
+import static Pantallas.LoginFrame.COLOR_PLACEHOLDER;
+import static Pantallas.LoginFrame.COLOR_TEXTO;
+import Pantallas.LoginFrame.CampoTexto;
+import static Pantallas.LoginFrame.FUENTE;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -48,27 +46,28 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-public class EditarEstudioFrame extends JFrame {
+public class RegistrarEstudioFrame extends JFrame {
+
+    private static final String TEXTO_SELECCION = "Seleccionar tipo de muestra...";
 
     private final Font FUENTE_TITULO = new Font(FUENTE, Font.BOLD, 22);
     private final Font FUENTE_NORMAL = new Font(FUENTE, Font.PLAIN, 14);
 
     private final UsuarioDTO usuarioActual;
-    private final Integer idEstudio;
 
     private final IEstudioNegocio estudioNegocio;
     private final ITipoMuestraNegocio tipoMuestraNegocio;
 
     private List<TipoMuestraDTO> tiposMuestra = new ArrayList<>();
 
-    private final List<ParametroDTO> parametros = new ArrayList<>();
+    private final List<CrearParametroDTO> parametros = new ArrayList<>();
     private final List<Integer> filaAParametro = new ArrayList<>();
 
     protected final CampoTexto txtNombre = new CampoTexto("ej.Biometria hematica");
-    protected final JComboBox<String> cmbMuestra = new JComboBox<>();
+    protected final JComboBox<String> cmbMuestra = new JComboBox<>(new String[]{TEXTO_SELECCION});
     protected JTextArea txtNota;
-    protected final JLabel lblTitulo = new JLabel("Editar estudio");
-    protected String mensajeExito = "Estudio actualizado correctamente.";
+    protected final JLabel lblTitulo = new JLabel("Nuevo estudio");
+    protected String mensajeExito = "Estudio guardado correctamente.";
 
     private JTable tablaParametros;
 
@@ -80,13 +79,12 @@ public class EditarEstudioFrame extends JFrame {
         }
     };
 
-    public EditarEstudioFrame(UsuarioDTO usuario, Integer idEstudio) {
+    public RegistrarEstudioFrame(UsuarioDTO usuario) {
         this.usuarioActual = usuario;
-        this.idEstudio = idEstudio;
         this.estudioNegocio = FabricaNegocio.crearEstudioNegocio();
         this.tipoMuestraNegocio = FabricaNegocio.crearTipoMuestraNegocio();
 
-        setTitle("Salud Total - Editar Estudio");
+        setTitle("Salud Total - Nuevo Estudio");
         setSize(900, 720);
         setMinimumSize(new Dimension(480, 520));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -133,10 +131,9 @@ public class EditarEstudioFrame extends JFrame {
 
         setContentPane(panelPrincipal);
 
-        cargarDatos();
+        cargarTiposMuestra();
     }
 
- 
     private JPanel crearBarraNavegacion() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 0));
         panel.setBackground(COLOR_FONDO);
@@ -267,6 +264,7 @@ public class EditarEstudioFrame extends JFrame {
         JButton btnAgregar = crearBoton("Agregar parametro");
         JButton btnEditar = crearBoton("Editar parametro");
         JButton btnEliminar = crearBoton("Eliminar parametro");
+
         btnAgregar.addActionListener(e -> agregarParametro());
         btnEditar.addActionListener(e -> editarParametro());
         btnEliminar.addActionListener(e -> eliminarParametro());
@@ -313,45 +311,28 @@ public class EditarEstudioFrame extends JFrame {
         return boton;
     }
 
-
-    private void cargarDatos() {
+    private void cargarTiposMuestra() {
         try {
             tiposMuestra = tipoMuestraNegocio.obtenerTodos();
+
             cmbMuestra.removeAllItems();
+            cmbMuestra.addItem(TEXTO_SELECCION);
             for (TipoMuestraDTO tipo : tiposMuestra) {
                 cmbMuestra.addItem(tipo.getNombre());
             }
-
-            EstudioDTO estudio = estudioNegocio.obtenerCompleto(idEstudio);
-            txtNombre.setText(estudio.getNombre());
-            txtNota.setText(estudio.getDescripcion());
-
-            for (int i = 0; i < tiposMuestra.size(); i++) {
-                if (tiposMuestra.get(i).getId().equals(estudio.getIdTipoMuestra())) {
-                    cmbMuestra.setSelectedIndex(i);
-                    break;
-                }
-            }
-
-            parametros.clear();
-            parametros.addAll(estudio.getParametros());
-            recargarTabla();
         } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
-                    "No se pudo cargar el estudio", JOptionPane.ERROR_MESSAGE);
+                    "No se pudieron cargar los tipos de muestra", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    /**
-     * Una fila por rango; un parametro no numerico ocupa una sola fila.
-     */
     private void recargarTabla() {
         modeloParametros.setRowCount(0);
         filaAParametro.clear();
         for (int i = 0; i < parametros.size(); i++) {
-            ParametroDTO p = parametros.get(i);
+            CrearParametroDTO p = parametros.get(i);
             if (Boolean.TRUE.equals(p.getNumerico()) && !p.getRangos().isEmpty()) {
-                for (RangoDTO r : p.getRangos()) {
+                for (CrearRangoDTO r : p.getRangos()) {
                     modeloParametros.addRow(new Object[]{
                         p.getOrdenAparicion(), p.getNombre(), p.getUnidadMedida(),
                         r.getInicio() + "-" + r.getFin(),
@@ -370,10 +351,9 @@ public class EditarEstudioFrame extends JFrame {
         }
     }
 
-   
     private void agregarParametro() {
         new RegistrarParametrosFrame(this, maxOrden() + 1, p -> {
-            parametros.add(aParametroDTO(p, null));
+            parametros.add(p);
             recargarTabla();
         }).setVisible(true);
     }
@@ -385,9 +365,9 @@ public class EditarEstudioFrame extends JFrame {
                     "Sin seleccion", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        ParametroDTO actual = parametros.get(indice);
-        new RegistrarParametrosFrame(this, actual.getOrdenAparicion(), aCrearParametroDTO(actual), p -> {
-            parametros.set(indice, aParametroDTO(p, actual.getId()));
+        CrearParametroDTO actual = parametros.get(indice);
+        new RegistrarParametrosFrame(this, actual.getOrdenAparicion(), actual, p -> {
+            parametros.set(indice, p);
             recargarTabla();
         }).setVisible(true);
     }
@@ -399,14 +379,32 @@ public class EditarEstudioFrame extends JFrame {
                     "Sin seleccion", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        ParametroDTO p = parametros.get(indice);
+        CrearParametroDTO p = parametros.get(indice);
         int confirmar = JOptionPane.showConfirmDialog(this,
-                "¿Eliminar el parametro '" + p.getNombre() + "'?\nSe aplicara al guardar el estudio.",
+                "¿Eliminar el parametro '" + p.getNombre() + "'?",
                 "Confirmar", JOptionPane.YES_NO_OPTION);
         if (confirmar == JOptionPane.YES_OPTION) {
             parametros.remove(indice);
             recargarTabla();
         }
+    }
+
+    private int indiceParametroSeleccionado() {
+        int fila = tablaParametros.getSelectedRow();
+        if (fila < 0 || fila >= filaAParametro.size()) {
+            return -1;
+        }
+        return filaAParametro.get(fila);
+    }
+
+    private int maxOrden() {
+        int max = 0;
+        for (CrearParametroDTO p : parametros) {
+            if (p.getOrdenAparicion() != null && p.getOrdenAparicion() > max) {
+                max = p.getOrdenAparicion();
+            }
+        }
+        return max;
     }
 
     private void guardar() {
@@ -419,7 +417,7 @@ public class EditarEstudioFrame extends JFrame {
                     "Campos vacios", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (indiceMuestra < 0 || indiceMuestra >= tiposMuestra.size()) {
+        if (indiceMuestra <= 0 || indiceMuestra - 1 >= tiposMuestra.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona un tipo de muestra.",
                     "Sin tipo de muestra", JOptionPane.WARNING_MESSAGE);
             return;
@@ -430,17 +428,20 @@ public class EditarEstudioFrame extends JFrame {
             return;
         }
 
-        EstudioDTO dto = new EstudioDTO(idEstudio, nombre, descripcion,
-                tiposMuestra.get(indiceMuestra).getId());
+        Integer idTipoMuestra = tiposMuestra.get(indiceMuestra - 1).getId();
+        CrearEstudioDTO dto = new CrearEstudioDTO(nombre, descripcion, idTipoMuestra);
         dto.setParametros(new ArrayList<>(parametros));
 
         try {
-            estudioNegocio.actualizarCompleto(dto);
+            estudioNegocio.registrarCompleto(dto);
             JOptionPane.showMessageDialog(this, mensajeExito);
             volver();
         } catch (NegocioException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
-                    "No se pudo actualizar el estudio", JOptionPane.ERROR_MESSAGE);
+                    "No se pudo guardar el estudio", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + ex.getMessage(),
+                    "No se pudo guardar el estudio", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -449,55 +450,6 @@ public class EditarEstudioFrame extends JFrame {
         dispose();
     }
 
-   
-    private int indiceParametroSeleccionado() {
-        int fila = tablaParametros.getSelectedRow();
-        if (fila < 0 || fila >= filaAParametro.size()) {
-            return -1;
-        }
-        return filaAParametro.get(fila);
-    }
-
-    private int maxOrden() {
-        int max = 0;
-        for (ParametroDTO p : parametros) {
-            if (p.getOrdenAparicion() != null && p.getOrdenAparicion() > max) {
-                max = p.getOrdenAparicion();
-            }
-        }
-        return max;
-    }
-
-    /**
-     * CrearParametroDTO (lo que entrega RegistrarParametrosFrame) ->
-     * ParametroDTO.
-     */
-    private ParametroDTO aParametroDTO(CrearParametroDTO c, Integer id) {
-        ParametroDTO p = new ParametroDTO(id, c.getNombre(), c.getDescripcion(),
-                c.getOrdenAparicion(), c.getUnidadMedida(), c.getNumerico(), idEstudio);
-        if (Boolean.TRUE.equals(c.getNumerico())) {
-            for (CrearRangoDTO r : c.getRangos()) {
-                p.getRangos().add(new RangoDTO(null, r.getInicio(), r.getFin(),
-                        r.getEdadInicio(), r.getEdadFin(), null));
-            }
-        }
-        return p;
-    }
-
-
-    private CrearParametroDTO aCrearParametroDTO(ParametroDTO p) {
-        CrearParametroDTO c = new CrearParametroDTO(p.getNombre(), p.getDescripcion(),
-                p.getOrdenAparicion(), p.getUnidadMedida(), p.getNumerico(), p.getIdEstudio());
-        List<CrearRangoDTO> rangos = new ArrayList<>();
-        for (RangoDTO r : p.getRangos()) {
-            rangos.add(new CrearRangoDTO(r.getInicio(), r.getFin(),
-                    r.getEdadInicio(), r.getEdadFin(), null));
-        }
-        c.setRangos(rangos);
-        return c;
-    }
-
-    
     private static class BotonClaro extends JButton {
 
         BotonClaro(String texto) {
@@ -524,5 +476,4 @@ public class EditarEstudioFrame extends JFrame {
             super.paintComponent(g);
         }
     }
-
 }

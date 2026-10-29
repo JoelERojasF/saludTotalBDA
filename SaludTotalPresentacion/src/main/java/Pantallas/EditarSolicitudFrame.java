@@ -1,4 +1,4 @@
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.ClienteDTO;
 import DTO.DoctorDTO;
@@ -12,9 +12,9 @@ import Negocio.Interfaces.IDoctorNegocio;
 import Negocio.Interfaces.IEstudioNegocio;
 import Negocio.Interfaces.ISolicitudNegocio;
 import Negocio.SolicitudNegocio;
-import com.saludtotalpresentacion.LoginFrame.CampoTexto;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
+import Pantallas.LoginFrame.CampoTexto;
+import static Pantallas.LoginFrame.COLOR_FONDO;
+import static Pantallas.LoginFrame.COLOR_TEXTO;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -1,7 +1,7 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.ClienteDTO;
 import DTO.DoctorDTO;
@@ -17,9 +17,9 @@ import Negocio.Interfaces.IEstudioNegocio;
 import Negocio.Interfaces.ISolicitudNegocio;
 import Negocio.ResultadoNegocio;
 import Negocio.SolicitudNegocio;
-import com.saludtotalpresentacion.LoginFrame.CampoTexto;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
+import Pantallas.LoginFrame.CampoTexto;
+import static Pantallas.LoginFrame.COLOR_FONDO;
+import static Pantallas.LoginFrame.COLOR_TEXTO;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -311,7 +311,6 @@ public class SolicitudesFrame extends JFrame {
         return sb.toString();
     }
 
-    // UI
     private JPanel crearBarraNavegacion() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 0));
         panel.setBackground(COLOR_FONDO);

@@ -1,7 +1,7 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.Crear.CrearClienteDTO;
 import DTO.UsuarioDTO;
@@ -9,7 +9,7 @@ import Exception.NegocioException;
 import Negocio.FabricaNegocio;
 import Negocio.Interfaces.IClienteNegocio;
 import Validador.Validador;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
+import static Pantallas.LoginFrame.COLOR_TEXTO;
 
 import java.awt.Color;
 import java.awt.Component;

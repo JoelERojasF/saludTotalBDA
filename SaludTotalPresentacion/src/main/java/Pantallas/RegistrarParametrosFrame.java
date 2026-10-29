@@ -1,14 +1,14 @@
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.Crear.CrearParametroDTO;
 import DTO.Crear.CrearRangoDTO;
-import com.saludtotalpresentacion.LoginFrame.BotonRedondeado;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_BORDE;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_PLACEHOLDER;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
-import com.saludtotalpresentacion.LoginFrame.CampoTexto;
-import static com.saludtotalpresentacion.LoginFrame.FUENTE;
+import Pantallas.LoginFrame.BotonRedondeado;
+import static Pantallas.LoginFrame.COLOR_BORDE;
+import static Pantallas.LoginFrame.COLOR_FONDO;
+import static Pantallas.LoginFrame.COLOR_PLACEHOLDER;
+import static Pantallas.LoginFrame.COLOR_TEXTO;
+import Pantallas.LoginFrame.CampoTexto;
+import static Pantallas.LoginFrame.FUENTE;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -138,9 +138,6 @@ public class RegistrarParametrosFrame extends JFrame {
         panel.add(Box.createVerticalStrut(8));
     }
 
-    /**
-     * Cuadro grande con bordes redondeados donde se van mostrando los rangos.
-     */
     private JPanel crearCuadroRango() {
         txtRango.setEditable(false);
         txtRango.setLineWrap(true);
@@ -314,9 +311,6 @@ public class RegistrarParametrosFrame extends JFrame {
         }
     }
 
-    /**
-     * Area de texto transparente que muestra un placeholder cuando esta vacia.
-     */
     private static class AreaTexto extends JTextArea {
 
         private final String placeholder;
@@ -344,9 +338,6 @@ public class RegistrarParametrosFrame extends JFrame {
         }
     }
 
-    /**
-     * Boton gris redondeado (Registrar Rango).
-     */
     private static class BotonGris extends JButton {
 
         private boolean hover = false;

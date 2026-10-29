@@ -1,4 +1,4 @@
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.ClienteDTO;
 import DTO.DoctorDTO;
@@ -16,11 +16,11 @@ import Negocio.ParametroNegocio;
 import Negocio.RangoNegocio;
 import Negocio.ResultadoNegocio;
 import Negocio.SolicitudNegocio;
-import com.saludtotalpresentacion.LoginFrame.BotonRedondeado;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_FONDO;
-import static com.saludtotalpresentacion.LoginFrame.COLOR_TEXTO;
-import com.saludtotalpresentacion.LoginFrame.CampoTexto;
-import static com.saludtotalpresentacion.LoginFrame.FUENTE;
+import Pantallas.LoginFrame.BotonRedondeado;
+import static Pantallas.LoginFrame.COLOR_FONDO;
+import static Pantallas.LoginFrame.COLOR_TEXTO;
+import Pantallas.LoginFrame.CampoTexto;
+import static Pantallas.LoginFrame.FUENTE;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

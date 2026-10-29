@@ -1,12 +1,12 @@
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.Crear.CrearUsuarioDTO;
 import Exception.NegocioException;
 import Negocio.Interfaces.IUsuarioNegocio;
 import Negocio.UsuarioNegocio;
-import com.saludtotalpresentacion.LoginFrame.BotonRedondeado;
-import com.saludtotalpresentacion.LoginFrame.CampoPassword;
-import com.saludtotalpresentacion.LoginFrame.CampoTexto;
+import Pantallas.LoginFrame.BotonRedondeado;
+import Pantallas.LoginFrame.CampoPassword;
+import Pantallas.LoginFrame.CampoTexto;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;

@@ -1,4 +1,4 @@
-package com.saludtotalpresentacion;
+package Pantallas;
 
 import DTO.ClienteDTO;
 import DTO.DoctorDTO;
