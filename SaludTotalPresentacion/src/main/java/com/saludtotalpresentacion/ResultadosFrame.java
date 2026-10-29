@@ -356,7 +356,9 @@ public class ResultadosFrame extends JFrame {
         for (Object[] s : todas) {
             String folio = s[1].toString().toLowerCase();
             String paciente = s[2].toString().toLowerCase();
-            if (folio.contains(texto) || paciente.contains(texto)) {
+            String doctor = s[3].toString().toLowerCase();
+            String estudio = s[4].toString().toLowerCase();
+            if (folio.contains(texto) || paciente.contains(texto) || doctor.contains(texto) || estudio.contains(texto)) {
                 visibles.add(s);
                 modeloLista.addRow(new Object[]{false, s[1], s[2], s[3], s[4]});
             }

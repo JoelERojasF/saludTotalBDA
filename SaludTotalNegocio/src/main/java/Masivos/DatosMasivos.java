@@ -36,7 +36,7 @@ public class DatosMasivos {
     
     public void InsertsDatosMasivos() throws NegocioException{
         CrearUsuarioDTO UDTO = new CrearUsuarioDTO("admin", "123");
-        CrearEmpresaDTO EDTO = new CrearEmpresaDTO("Salud Total", "Av. Bienestar 245, Col. Centro Médico, C.P. 83000, Hermosillo, Sonora, México.", "contacto@saludintegral.example", "6620001234", "SINO261027AB1", "SALUD-EMP-2026-001");
+        CrearEmpresaDTO EDTO = new CrearEmpresaDTO("Salud Total", "Av. Bienestar 245, Col. Centro Médico, C.P. 83000, Hermosillo, Sonora, México.", "contacto@saludtotoal.example", "6620001234", "SINO261027AB1", "SALUD-EMP-2026-001");
         
         CrearClienteDTO CDTO1 = new CrearClienteDTO("Daniela", "López", "Valenzuela", "2021-03-15", "Femenino", "O+");
         CrearClienteDTO CDTO2 = new CrearClienteDTO("Carlos Alberto", "Méndez", "Ibarra","2021-08-22", "Masculino", "A+");

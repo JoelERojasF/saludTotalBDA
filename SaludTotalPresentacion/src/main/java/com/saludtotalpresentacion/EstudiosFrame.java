@@ -46,7 +46,7 @@ public class EstudiosFrame extends JFrame {
     private boolean cargando = false;
     private String[] seleccionado; 
 
-    private final CampoTexto txtBuscar = new CampoTexto("buscar estudio");
+    private final CampoTexto txtBuscar = new CampoTexto("buscar...");
 
     private final DefaultTableModel modeloLista = new DefaultTableModel(new Object[]{"Sel", "Estudio"}, 0) {
         @Override
@@ -283,7 +283,7 @@ public class EstudiosFrame extends JFrame {
         visibles.clear();
         seleccionado = null;
         for (String[] s : todos) {
-            if (s[0].toLowerCase().contains(t)) {
+            if (s[0].toLowerCase().contains(t) || s[2].toLowerCase().contains(t)) {
                 visibles.add(s);
                 modeloLista.addRow(new Object[]{false, s[0] + " - Muestra: " + s[2]});
             }

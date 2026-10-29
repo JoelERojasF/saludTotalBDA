@@ -178,8 +178,10 @@ public class SolicitudesFrame extends JFrame {
         for (Object[] fila : todasLasFilas) {
             String folio = fila[2].toString().toLowerCase();
             String paciente = fila[3].toString().toLowerCase();
+            String estudio = fila[4].toString().toLowerCase();
+            String doctor = fila[5].toString().toLowerCase();
 
-            if (folio.contains(textoBusqueda) || paciente.contains(textoBusqueda)) {
+            if (folio.toLowerCase().contains(textoBusqueda) || paciente.toLowerCase().contains(textoBusqueda) || estudio.toLowerCase().contains(textoBusqueda) || doctor.toLowerCase().contains(textoBusqueda)) {
                 filasVisibles.add(fila);
                 modeloTabla.addRow(new Object[]{
                     fila[1], fila[2], fila[3], fila[4], fila[5]
@@ -346,7 +348,7 @@ public class SolicitudesFrame extends JFrame {
 
     private JPanel crearSeccionBuscador() {
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 25, 0));
         panel.setBackground(COLOR_FONDO);
 
         JLabel lblTitulo = new JLabel("Solicitudes");
@@ -359,7 +361,7 @@ public class SolicitudesFrame extends JFrame {
         pnlBusqueda.setAlignmentX(Component.LEFT_ALIGNMENT);
         pnlBusqueda.setMaximumSize(new Dimension(850, 42));
 
-        txtBuscar = new CampoTexto("Buscar folio o paciente...");
+        txtBuscar = new CampoTexto("Buscar...");
         txtBuscar.setPreferredSize(new Dimension(450, 42));
 
         txtBuscar.getDocument().addDocumentListener(new DocumentListener() {

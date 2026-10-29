@@ -5,6 +5,7 @@ import DTO.EstudioDTO;
 import DTO.ResultadoDTO;
 import DTO.SolicitudDTO;
 import DTO.UsuarioDTO;
+import Negocio.EstudioNegocio;
 import Negocio.FabricaNegocio;
 import Negocio.ResultadoNegocio;
 import Negocio.SolicitudNegocio;
@@ -27,6 +28,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
@@ -34,6 +36,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class ReportesFrame extends JFrame {
+    EstudioNegocio estNeg = new EstudioNegocio();
 
     private final Font FUENTE_TITULO = new Font(FUENTE, Font.BOLD, 22);
     private final Font FUENTE_NORMAL = new Font(FUENTE, Font.PLAIN, 14);
@@ -118,6 +121,7 @@ public class ReportesFrame extends JFrame {
     }
 
     private void filtrar() {
+        try{
         String texto = txtBuscarFolio.getText().trim().toLowerCase();
 
         panelLista.removeAll();
@@ -125,31 +129,41 @@ public class ReportesFrame extends JFrame {
             SolicitudDTO s = (SolicitudDTO) fila[0];
             String cliente = (String) fila[1];
             String folio = s.getFolio() == null ? "" : s.getFolio().toLowerCase();
+            
+            String estudio = estNeg.buscarPorId(s.getIdEstudio()).getNombre();
 
-            if (texto.isEmpty() || folio.contains(texto) || cliente.toLowerCase().contains(texto)) {
-                panelLista.add(crearFila(s, cliente, (String) fila[2], (String) fila[3]));
+            if (texto.isEmpty() || folio.contains(texto) || cliente.toLowerCase().contains(texto) || s.getFechaHoraGeneracion().contains(texto) || estudio.contains(texto)) {
+                panelLista.add(crearFila(s,folio, cliente, s.getFechaHoraGeneracion(),  estudio));
             }
         }
         panelLista.revalidate();
         panelLista.repaint();
+        }catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error al buscar resultados: " + ex.getMessage(),
+                    "Error de Conexión", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    private JPanel crearFila(SolicitudDTO s, String cliente, String fecha, String tipoMuestra) {
+    private JPanel crearFila(SolicitudDTO s,String folio, String cliente, String fechaHora, String estudio) {
         JPanel fila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
         fila.setBackground(COLOR_FONDO);
         fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        
+        JLabel lblFolio = new JLabel(folio);
+        lblFolio.setFont(FUENTE_NORMAL);
+        lblFolio.setPreferredSize(new Dimension(70, 30));
 
         JLabel lblCliente = new JLabel(cliente);
         lblCliente.setFont(FUENTE_NORMAL);
-        lblCliente.setPreferredSize(new Dimension(280, 30));
+        lblCliente.setPreferredSize(new Dimension(160, 30));
 
-        JLabel lblFecha = new JLabel(fecha);
+        JLabel lblFecha = new JLabel(fechaHora);
         lblFecha.setFont(FUENTE_NORMAL);
-        lblFecha.setPreferredSize(new Dimension(110, 30));
+        lblFecha.setPreferredSize(new Dimension(180, 30));
 
-        JLabel lblMuestra = new JLabel(tipoMuestra);
-        lblMuestra.setFont(FUENTE_NORMAL);
-        lblMuestra.setPreferredSize(new Dimension(180, 30));
+        JLabel lblEstudio = new JLabel(estudio);
+        lblEstudio.setFont(FUENTE_NORMAL);
+        lblEstudio.setPreferredSize(new Dimension(150, 30));
 
         JButton btnGenerar = new JButton("Generar Reporte PDF");
         btnGenerar.addActionListener(e -> {
@@ -163,9 +177,10 @@ public class ReportesFrame extends JFrame {
         btnGenerar.setBorderPainted(false);
         btnGenerar.setFocusPainted(false);
 
+        fila.add(lblFolio);
         fila.add(lblCliente);
         fila.add(lblFecha);
-        fila.add(lblMuestra);
+        fila.add(lblEstudio);
         fila.add(btnGenerar);
         return fila;
     }
