@@ -286,7 +286,7 @@ public class EditarEstudioFrame extends JFrame {
     // Acciones
     // ------------------------------------------------------------------
     private void agregarParametro() {
-        new AgregarParametrosFrame(this, modeloParametros.getRowCount() + 1, p -> {
+        new RegistrarParametrosFrame(this, modeloParametros.getRowCount() + 1, p -> {
             for (CrearRangoDTO r : p.getRangos()) {
                 modeloParametros.addRow(new Object[]{
                     p.getOrdenAparicion(), p.getNombre(), p.getUnidadMedida(),

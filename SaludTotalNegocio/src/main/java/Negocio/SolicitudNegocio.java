@@ -64,10 +64,6 @@ public class SolicitudNegocio implements ISolicitudNegocio {
             throw new NegocioException("Falta el id de la solicitud a actualizar.");
         }
         validar(dto.getFolio(), dto.getFechaHoraGeneracion(), dto.getIdCliente(), dto.getIdEstudio());
-        if (!(dto.getIdDoctor() > 0) || dto.getIdDoctor() == null) {
-            dto.setIdDoctor(null);
-        }
-
         try {
             SolicitudEntidad buscada = solicitudDAO.buscarPorId(dto.getId());
             if (buscada == null) {
@@ -80,7 +76,7 @@ public class SolicitudNegocio implements ISolicitudNegocio {
             entidad.setId(dto.getId());
             return EntidadADTO(solicitudDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar la solicitud.", e);
+            throw new NegocioException("No se pudo actualizar la solicitud por: " + e.getMessage(), e);
         }
     }
 
@@ -156,7 +152,7 @@ public class SolicitudNegocio implements ISolicitudNegocio {
         try {
             List<SolicitudDTO> lista = new ArrayList<>();
             for (SolicitudEntidad e : solicitudDAO.obtenerTodos()) {
-                if (e.getResultados().size() == 0 && e.getCancelada() == false) {
+                if (e.getResultados().isEmpty() && e.getCancelada() == false) {
                     lista.add(EntidadADTO(e));
                 }
             }
@@ -203,15 +199,27 @@ public class SolicitudNegocio implements ISolicitudNegocio {
     }
 
     private SolicitudEntidad DTOAEntidad(SolicitudDTO dto) throws PersistenciaException {
-        SolicitudEntidad creado = new SolicitudEntidad(
-                dto.getFolio(),
-                Timestamp.valueOf(dto.getFechaHoraGeneracion()),
-                dto.getCancelada(),
-                clienteDAO.buscarPorId(dto.getIdCliente()),
-                doctorDAO.buscarPorId(dto.getIdDoctor()),
-                estudioDAO.buscarPorId(dto.getIdEstudio()));
-        creado.setId(dto.getId());
-        return creado;
+        if(dto.getIdDoctor() == null){
+            SolicitudEntidad creado = new SolicitudEntidad(
+                    dto.getFolio(),
+                    Timestamp.valueOf(dto.getFechaHoraGeneracion()),
+                    dto.getCancelada(),
+                    clienteDAO.buscarPorId(dto.getIdCliente()),
+                    null,
+                    estudioDAO.buscarPorId(dto.getIdEstudio()));
+            creado.setId(dto.getId());
+            return creado;
+        }else{
+            SolicitudEntidad creado = new SolicitudEntidad(
+                    dto.getFolio(),
+                    Timestamp.valueOf(dto.getFechaHoraGeneracion()),
+                    dto.getCancelada(),
+                    clienteDAO.buscarPorId(dto.getIdCliente()),
+                    doctorDAO.buscarPorId(dto.getIdDoctor()),
+                    estudioDAO.buscarPorId(dto.getIdEstudio()));
+            creado.setId(dto.getId());
+            return creado;
+        }   
     }
 
     private SolicitudEntidad DTOAEntidad(CrearSolicitudDTO dto) throws PersistenciaException {

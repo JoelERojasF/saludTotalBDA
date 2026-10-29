@@ -26,6 +26,7 @@ import java.util.List;
 public class RangoNegocio implements IRangoNegocio{
     private final IRangoDAO rangoDAO;
     private IParametroDAO parametroDAO;
+    private ParametroNegocio parN = new ParametroNegocio();
     Validador val = new Validador();
 
     public RangoNegocio() {
@@ -38,10 +39,10 @@ public class RangoNegocio implements IRangoNegocio{
             throw new NegocioException("No se recibieron los datos del rango.");
         }
         validar( dto.getInicio(), dto.getFin(), dto.getEdadInicio(), dto.getEdadFin(), dto.getIdParametro());
-
         try {
             RangoEntidad entidad = DTOAEntidad(dto);
             return EntidadADTO(rangoDAO.guardar(entidad));
+            
         } catch (PersistenciaException e) {
             throw new NegocioException("No se pudo registrar el rango. Revisa la conexion con la base de datos.", e);
         }
@@ -62,7 +63,7 @@ public class RangoNegocio implements IRangoNegocio{
             entidad.setId(dto.getId());
             return EntidadADTO(rangoDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar el rango.", e);
+            throw new NegocioException("No se pudo actualizar el rango por: "+ e.getMessage(), e);
         }
     }
 
@@ -80,7 +81,7 @@ public class RangoNegocio implements IRangoNegocio{
             }
             rangoDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el rango.", e);
+            throw new NegocioException("No se pudo eliminar el rango por: "+ e.getMessage(), e);
         }
     }
 
@@ -99,7 +100,7 @@ public class RangoNegocio implements IRangoNegocio{
             }
             return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo consultar el rango.", e);
+            throw new NegocioException("No se pudo consultar el rango por: "+ e.getMessage(), e);
         }
     }
 
@@ -112,7 +113,7 @@ public class RangoNegocio implements IRangoNegocio{
             }
             return lista;
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo obtener la lista de rangos.", e);
+            throw new NegocioException("No se pudo obtener la lista de rangos por: "+ e.getMessage(), e);
         }
     }
     

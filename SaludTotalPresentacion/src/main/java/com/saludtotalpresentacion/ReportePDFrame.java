@@ -229,8 +229,6 @@ public class ReportePDFrame extends JFrame{
                 }
             }
             doc.add(tabla);
-
-            doc.add(tabla);
         doc.close();
 
         Desktop.getDesktop().browse(archivo.toURI());   // lo abre en el navegador

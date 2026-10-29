@@ -89,7 +89,7 @@ public class EstudioNegocio implements IEstudioNegocio {
 
             return EntidadADTO(estudioDAO.guardarCompleto(estudio, entidadesParametro));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo registrar el estudio con sus parametros. No se guardo nada.", e);
+            throw new NegocioException("No se pudo registrar el estudio con sus parametros. No se guardo nada por: "+ e.getMessage(), e);
         }
     }
 
@@ -108,7 +108,7 @@ public class EstudioNegocio implements IEstudioNegocio {
             entidad.setId(dto.getId());
             return EntidadADTO(estudioDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar el estudio.", e);
+            throw new NegocioException("No se pudo actualizar el estudio por: "+ e.getMessage(), e);
         }
     }
 
@@ -126,7 +126,7 @@ public class EstudioNegocio implements IEstudioNegocio {
             }
             estudioDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el estudio.", e);
+            throw new NegocioException("No se pudo eliminar el estudio por: "+ e.getMessage(), e);
         }
     }
 
@@ -145,7 +145,7 @@ public class EstudioNegocio implements IEstudioNegocio {
             }
             return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo consultar el estudio.", e);
+            throw new NegocioException("No se pudo consultar el estudio por: "+ e.getMessage(), e);
         }
     }
 
@@ -158,7 +158,7 @@ public class EstudioNegocio implements IEstudioNegocio {
             }
             return lista;
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo obtener la lista de estudios.", e);
+            throw new NegocioException("No se pudo obtener la lista de estudios por: "+ e.getMessage(), e);
         }
     }
 
@@ -227,24 +227,11 @@ public class EstudioNegocio implements IEstudioNegocio {
     private ParametroEntidad parametroAEntidad(CrearParametroDTO p) {
         boolean numerico = Boolean.TRUE.equals(p.getNumerico());
 
-        Double valorInicial = null;
-        Double valorFinal = null;
-        if (numerico) {
-            if (val.validarNumeroDecimal(p.getValorInicial())) {
-                valorInicial = Double.parseDouble(p.getValorInicial().trim());
-            }
-            if (val.validarNumeroDecimal(p.getValorFinal())) {
-                valorFinal = Double.parseDouble(p.getValorFinal().trim());
-            }
-        }
-
         ParametroEntidad entidad = new ParametroEntidad(
                 p.getNombre().trim(),
                 p.getDescripcion().trim(),
                 p.getOrdenAparicion(),
                 p.getUnidadMedida(),
-                valorInicial,
-                valorFinal,
                 numerico,
                 null);
 

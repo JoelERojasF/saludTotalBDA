@@ -66,7 +66,7 @@ public class ClienteNegocio implements IClienteNegocio {
             entidad.setId(dto.getId());
             return EntidadADTO(clienteDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar el cliente.", e);
+            throw new NegocioException("No se pudo actualizar el cliente por: "+ e.getMessage(), e);
         }
     }
 
@@ -84,7 +84,7 @@ public class ClienteNegocio implements IClienteNegocio {
             }
             clienteDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el cliente. Puede tener solicitudes registradas.", e);
+            throw new NegocioException("No se pudo eliminar el cliente por: "+ e.getMessage(), e);
         }
     }
 
@@ -103,7 +103,7 @@ public class ClienteNegocio implements IClienteNegocio {
             }
             return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo consultar el cliente.", e);
+            throw new NegocioException("No se pudo consultar el cliente por: "+ e.getMessage(), e);
         }
     }
 
@@ -116,7 +116,7 @@ public class ClienteNegocio implements IClienteNegocio {
             }
             return lista;
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo obtener la lista de clientes.", e);
+            throw new NegocioException("No se pudo obtener la lista de clientes por: "+ e.getMessage(), e);
         }
     }
 

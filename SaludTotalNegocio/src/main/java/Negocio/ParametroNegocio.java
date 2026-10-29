@@ -37,17 +37,6 @@ public class ParametroNegocio implements IParametroNegocio{
             throw new NegocioException("No se recibieron los datos del parametro.");
         }
         validar(dto.getNombre(), dto.getDescripcion(), dto.getOrdenAparicion(), dto.getUnidadMedida(), dto.getIdEstudio());
-        if(!dto.getNumerico()){
-            dto.setValorInicial(null);
-            dto.setValorFinal(null);
-        }else{
-            if (!val.validarNumeroDecimal(dto.getValorInicial())) {
-                dto.setValorInicial(null);
-            }
-            if (!val.validarNumeroDecimal(dto.getValorFinal())) {
-                dto.setValorFinal(null);
-            }
-        }
         
         try {
             ParametroEntidad entidad = DTOAEntidad(dto);
@@ -63,17 +52,6 @@ public class ParametroNegocio implements IParametroNegocio{
             throw new NegocioException("Falta el id del parametro a actualizar.");
         }
         validar(dto.getNombre(), dto.getDescripcion(), dto.getOrdenAparicion(),dto.getUnidadMedida(), dto.getIdEstudio());
-        if(!dto.getNumerico()){
-            dto.setValorInicial(null);
-            dto.setValorFinal(null);
-        }else{
-            if (!val.validarNumeroDecimal(dto.getValorInicial())) {
-                dto.setValorInicial(null);
-            }
-            if (!val.validarNumeroDecimal(dto.getValorFinal())) {
-                dto.setValorFinal(null);
-            }
-        }
 
         try {
             if (parametroDAO.buscarPorId(dto.getId()) == null) {
@@ -83,7 +61,7 @@ public class ParametroNegocio implements IParametroNegocio{
             entidad.setId(dto.getId());
             return EntidadADTO(parametroDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar el parametro.", e);
+            throw new NegocioException("No se pudo actualizar el parametro por: "+ e.getMessage(), e);
         }
     }
 
@@ -101,7 +79,7 @@ public class ParametroNegocio implements IParametroNegocio{
             }
             parametroDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el parametro.", e);
+            throw new NegocioException("No se pudo eliminar el parametro por: "+ e.getMessage(), e);
         }
     }
 
@@ -120,7 +98,7 @@ public class ParametroNegocio implements IParametroNegocio{
             }
             return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo consultar el parametro.", e);
+            throw new NegocioException("No se pudo consultar el parametro por: "+ e.getMessage(), e);
         }
     }
 
@@ -133,7 +111,7 @@ public class ParametroNegocio implements IParametroNegocio{
             }
             return lista;
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo obtener la lista de parametros.", e);
+            throw new NegocioException("No se pudo obtener la lista de parametros por: "+ e.getMessage(), e);
         }
     }
     
@@ -162,8 +140,6 @@ public class ParametroNegocio implements IParametroNegocio{
                 e.getDescripcion(),
                 e.getOrdenAparicion(),
                 e.getUnidadMedida(),
-                e.getValorInicial()+"",
-                e.getValorFinal()+"",
                 e.getNumerico(),
                 e.getEstudio().getId());
     }
@@ -174,8 +150,6 @@ public class ParametroNegocio implements IParametroNegocio{
                 dto.getDescripcion(),
                 dto.getOrdenAparicion(),
                 dto.getUnidadMedida(),
-                Double.parseDouble(dto.getValorInicial()),
-                Double.parseDouble(dto.getValorFinal()),
                 dto.getNumerico(),
                 estudioDAO.buscarPorId(dto.getIdEstudio()));
         creado.setId(dto.getId());
@@ -188,8 +162,6 @@ public class ParametroNegocio implements IParametroNegocio{
                 dto.getDescripcion(),
                 dto.getOrdenAparicion(),
                 dto.getUnidadMedida(),
-                Double.parseDouble(dto.getValorInicial()),
-                Double.parseDouble(dto.getValorFinal()),
                 dto.getNumerico(),
                 estudioDAO.buscarPorId(dto.getIdEstudio()));
     }

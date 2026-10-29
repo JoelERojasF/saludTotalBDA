@@ -72,7 +72,7 @@ public class DoctorNegocio implements IDoctorNegocio{
             entidad.setId(dto.getId());
             return EntidadADTO(doctorDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar el doctor.", e);
+            throw new NegocioException("No se pudo actualizar el doctor por: "+ e.getMessage(), e);
         }
     }
 
@@ -90,7 +90,7 @@ public class DoctorNegocio implements IDoctorNegocio{
             }
             doctorDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el doctor. Puede tener solicitudes registradas.", e);
+            throw new NegocioException("No se pudo eliminar el doctor por: "+ e.getMessage(), e);
         }
     }
 
@@ -109,7 +109,7 @@ public class DoctorNegocio implements IDoctorNegocio{
             }
             return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo consultar el doctor.", e);
+            throw new NegocioException("No se pudo consultar el doctor por: "+ e.getMessage(), e);
         }
     }
 
@@ -122,7 +122,7 @@ public class DoctorNegocio implements IDoctorNegocio{
             }
             return lista;
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo obtener la lista de doctores.", e);
+            throw new NegocioException("No se pudo obtener la lista de doctores por: "+ e.getMessage(), e);
         }
     }
     

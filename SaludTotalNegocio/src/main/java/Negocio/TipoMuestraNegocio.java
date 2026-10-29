@@ -60,7 +60,7 @@ public class TipoMuestraNegocio implements ITipoMuestraNegocio{
             entidad.setId(dto.getId());
             return EntidadADTO(tipoMuestraDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar el tipo de muestra.", e);
+            throw new NegocioException("No se pudo actualizar el tipo de muestra por: "+ e.getMessage(), e);
         }
     }
 
@@ -78,7 +78,7 @@ public class TipoMuestraNegocio implements ITipoMuestraNegocio{
             }
             tipoMuestraDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el tipo de muestra.", e);
+            throw new NegocioException("No se pudo eliminar el tipo de muestra por: "+ e.getMessage(), e);
         }
     }
 
@@ -97,7 +97,7 @@ public class TipoMuestraNegocio implements ITipoMuestraNegocio{
             }
             return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo consultar el tipo de muestra.", e);
+            throw new NegocioException("No se pudo consultar el tipo de muestra por: "+ e.getMessage(), e);
         }    }
 
     @Override
@@ -109,7 +109,7 @@ public class TipoMuestraNegocio implements ITipoMuestraNegocio{
             }
             return lista;
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo obtener la lista de tipos de muestra.", e);
+            throw new NegocioException("No se pudo obtener la lista de tipos de muestra por: "+ e.getMessage(), e);
         }
     }
     

@@ -40,12 +40,6 @@ public class ParametroEntidad implements Serializable {
     @Column(name = "unidadMedida", nullable = false)
     private String unidadMedida;
     
-    @Column(name = "valorInicial", nullable = true)
-    private Double valorInicial;
-    
-    @Column(name = "valorFinal", nullable = true)
-    private Double valorFinal;
-    
     @Column(name = "numerico", nullable = false)
     private Boolean numerico;
     
@@ -62,13 +56,11 @@ public class ParametroEntidad implements Serializable {
     public ParametroEntidad() {
     }
 
-    public ParametroEntidad(String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, Double valorInicial, Double valorFinal, Boolean numerico, EstudioEntidad estudio) {
+    public ParametroEntidad(String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, Boolean numerico, EstudioEntidad estudio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ordenAparicion = ordenAparicion;
         this.unidadMedida = unidadMedida;
-        this.valorInicial = valorInicial;
-        this.valorFinal = valorFinal;
         this.numerico = numerico;
         this.estudio = estudio;
     }
@@ -112,22 +104,6 @@ public class ParametroEntidad implements Serializable {
     public void setUnidadMedida(String unidadMedida) {
         this.unidadMedida = unidadMedida;
     }
-    
-    public Double getValorInicial() {
-        return valorInicial;
-    }
-
-    public void setValorInicial(Double valorInicial) {
-        this.valorInicial = valorInicial;
-    }
-
-    public Double getValorFinal() {
-        return valorFinal;
-    }
-
-    public void setValorFinal(Double valorFinal) {
-        this.valorFinal = valorFinal;
-    }
 
     public Boolean getNumerico() {
         return numerico;
@@ -163,7 +139,7 @@ public class ParametroEntidad implements Serializable {
 
     @Override
     public String toString() {
-        return "ParametroEntidad{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + '}';
+        return "ParametroEntidad{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida +'}';
     }
     
     

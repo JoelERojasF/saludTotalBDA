@@ -68,7 +68,7 @@ public class ResultadoNegocio implements IResultadoNegocio{
             entidad.setId(dto.getId());
             return EntidadADTO(resultadoDAO.actualizar(entidad));
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo actualizar el resultado.", e);
+            throw new NegocioException("No se pudo actualizar el resultado por: "+ e.getMessage(), e);
         }
     }
 
@@ -86,7 +86,7 @@ public class ResultadoNegocio implements IResultadoNegocio{
             }
             resultadoDAO.eliminar(id);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo eliminar el resultado.", e);
+            throw new NegocioException("No se pudo eliminar el resultado por: "+ e.getMessage(), e);
         }
     }
 
@@ -105,7 +105,7 @@ public class ResultadoNegocio implements IResultadoNegocio{
             }
             return EntidadADTO(entidad);
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo consultar el resultado.", e);
+            throw new NegocioException("No se pudo consultar el resultado por: "+ e.getMessage(), e);
         }
     }
 
@@ -118,7 +118,7 @@ public class ResultadoNegocio implements IResultadoNegocio{
             }
             return lista;
         } catch (PersistenciaException e) {
-            throw new NegocioException("No se pudo obtener la lista de estudios.", e);
+            throw new NegocioException("No se pudo obtener la lista de estudios por: "+ e.getMessage(), e);
         }
     }
     

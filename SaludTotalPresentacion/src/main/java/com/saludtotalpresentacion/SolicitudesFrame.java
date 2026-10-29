@@ -518,14 +518,28 @@ public class SolicitudesFrame extends JFrame {
         btnCancelar.setPreferredSize(new Dimension(160, 40));
 
         btnCancelar.addActionListener(e -> cancelarSolicitud());
+        
 
         JButton btnEditar = crearBotonOscuro("Editar solicitud");
         btnEditar.setPreferredSize(new Dimension(160, 40));
+        
+        btnEditar.addActionListener(e -> editarSeleccionado());
 
         panel.add(btnCancelar);
         panel.add(btnEditar);
 
         return panel;
+    }
+    
+    private void editarSeleccionado() {
+        SolicitudDTO solicitudSeleccionada = obtenerSolicitudSeleccionada();
+        if (solicitudSeleccionada == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona un estudio para editar.",
+                    "Sin seleccion", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        new EditarSolicitudFrame(usuarioActual, solicitudSeleccionada).setVisible(true);
+        dispose();
     }
 
     private void cancelarSolicitud() {

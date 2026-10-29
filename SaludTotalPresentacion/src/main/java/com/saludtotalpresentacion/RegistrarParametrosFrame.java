@@ -29,6 +29,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -38,7 +39,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 
-public class AgregarParametrosFrame extends JFrame{
+public class RegistrarParametrosFrame extends JFrame{
 
     private final Font FUENTE_ETIQUETA = new Font(FUENTE, Font.PLAIN, 16);
 
@@ -50,11 +51,14 @@ public class AgregarParametrosFrame extends JFrame{
     private final CampoTexto txtOrden = new CampoTexto("orden");
     private final CampoTexto txtUnidadMedida = new CampoTexto("unidad de medida");
     private final AreaTexto txtRango = new AreaTexto("4  -  10 g/dL  20 - 25 años");
+    private final JCheckBox chkNumerico = new JCheckBox("Parametro numerico", true);
+    JButton btnRegistrar = new BotonRedondeado("Registrar");
+    JButton btnRegistrarRango = new BotonGris("Registrar Rango");
 
     // Rangos capturados; el idParametro queda en null: lo asigna la capa de negocio al guardar
     private final List<CrearRangoDTO> rangos = new ArrayList<>();
 
-    public AgregarParametrosFrame(JFrame padre, int siguienteOrden, Consumer<CrearParametroDTO> alRegistrar) {
+    public RegistrarParametrosFrame(JFrame padre, int siguienteOrden, Consumer<CrearParametroDTO> alRegistrar) {
         this.alRegistrar = alRegistrar;
 
         setTitle("Salud Total - Agregar parametro");
@@ -62,6 +66,8 @@ public class AgregarParametrosFrame extends JFrame{
         setMinimumSize(new Dimension(360, 540));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(padre);
+        
+        
 
         // el padre se deshabilita mientras este frame esta abierto
         padre.setEnabled(false);
@@ -85,13 +91,20 @@ public class AgregarParametrosFrame extends JFrame{
         agregarCampo(panel, "Orden", txtOrden);
         agregarCampo(panel, "unidad de medida", txtUnidadMedida);
 
+        chkNumerico.setFont(FUENTE_ETIQUETA);
+        chkNumerico.setForeground(COLOR_TEXTO);
+        chkNumerico.setBackground(COLOR_FONDO);
+        chkNumerico.setAlignmentX(Component.LEFT_ALIGNMENT);
+        chkNumerico.addActionListener(e -> alCambiarNumerico());
+        panel.add(chkNumerico);
+        panel.add(Box.createVerticalStrut(8));
+
         panel.add(crearEtiqueta("Rango"));
         panel.add(Box.createVerticalStrut(4));
         panel.add(crearCuadroRango());
         panel.add(Box.createVerticalStrut(8));
 
-        JButton btnRegistrar = new BotonRedondeado("Registrar");
-        JButton btnRegistrarRango = new BotonGris("Registrar Rango");
+
         configurarBoton(btnRegistrar);
         configurarBoton(btnRegistrarRango);
 
@@ -101,6 +114,8 @@ public class AgregarParametrosFrame extends JFrame{
 
         btnRegistrar.addActionListener(e -> registrar());
         btnRegistrarRango.addActionListener(e -> registrarRango());
+        
+        
 
         setContentPane(panel);
     }
@@ -226,13 +241,17 @@ public class AgregarParametrosFrame extends JFrame{
         rangos.add(new CrearRangoDTO( vMin, vMax, eMin, eMax, null));
         txtRango.append(vMin + "  -  " + vMax + "  " + eMin + " - " + eMax + " años\n");
     }
+    
+   
 
     private void registrar() {
         String nombre = txtNombre.getText().trim();
         String descripcion = txtDescripcion.getText().trim();
+        boolean numerico = chkNumerico.isSelected();
         String unidadMedida = txtUnidadMedida.getText().trim();
+        
 
-        if (nombre.isEmpty() || descripcion.isEmpty() || unidadMedida.isEmpty()) {
+        if (nombre.isEmpty() || descripcion.isEmpty() || (numerico && unidadMedida.isEmpty())) {
             JOptionPane.showMessageDialog(this, "El nombre, la descripcion y la unidad de medida son obligatorios.",
                     "Campos vacios", JOptionPane.WARNING_MESSAGE);
             return;
@@ -249,20 +268,40 @@ public class AgregarParametrosFrame extends JFrame{
                     "Orden invalido", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (rangos.isEmpty()) {
+        if (numerico && rangos.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Registra al menos un rango.",
                     "Sin rangos", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        
+        List<CrearRangoDTO> rangosFinales = new ArrayList<>(rangos);
+        if (!numerico) {
+            // rango "de relleno": valor 0 a 1, edad 0 a 1000
+            rangosFinales.clear();
+            rangosFinales.add(new CrearRangoDTO(0.0, 1.0, 0, 1000, null));
+        }
+
 
         // numerico = true porque cada parametro se define con rangos numericos;
         // valorInicial / valorFinal quedan en null (columnas opcionales)
         CrearParametroDTO parametro = new CrearParametroDTO(
-                nombre, descripcion, orden, unidadMedida, null, null, true, null);
-        parametro.setRangos(new ArrayList<>(rangos));
+                nombre, descripcion, orden, unidadMedida, numerico, null);
+        parametro.setRangos(rangosFinales);
 
         alRegistrar.accept(parametro);
         dispose();
+    }
+    
+    private void alCambiarNumerico() {
+        boolean numerico = chkNumerico.isSelected();
+        txtUnidadMedida.setEnabled(numerico);
+        btnRegistrarRango.setEnabled(numerico);
+        txtUnidadMedida.setText("");
+        if (!numerico) {
+            txtUnidadMedida.setText("positivo/negativo");
+            rangos.clear();
+            txtRango.setText("");
+        }
     }
 
     // ------------------------------------------------------------------

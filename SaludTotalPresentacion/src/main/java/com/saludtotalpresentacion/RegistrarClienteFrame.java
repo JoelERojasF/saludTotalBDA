@@ -135,7 +135,7 @@ public class RegistrarClienteFrame extends JFrame {
         lblSexo.setForeground(COLOR_TEXTO);
         lblSexo.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        cmbSexo = new JComboBox<>(new String[]{"Masculino", "Femenino"});
+        cmbSexo = new JComboBox<>(new String[]{"Seleccionar","Masculino", "Femenino"});
         cmbSexo.setBackground(Color.WHITE);
         cmbSexo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         cmbSexo.setPreferredSize(new Dimension(0, 40));
@@ -150,7 +150,7 @@ public class RegistrarClienteFrame extends JFrame {
         lblSangre.setForeground(COLOR_TEXTO);
         lblSangre.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        cmbTipoSangre = new JComboBox<>(new String[]{"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"});
+        cmbTipoSangre = new JComboBox<>(new String[]{"Seleccionar","A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"});
         cmbTipoSangre.setBackground(Color.WHITE);
         cmbTipoSangre.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         cmbTipoSangre.setPreferredSize(new Dimension(0, 40));
@@ -200,8 +200,17 @@ public class RegistrarClienteFrame extends JFrame {
             String nombreStr = txtNombre.getText().trim();
             String paternoStr = txtApellidoPaterno.getText().trim();
             String maternoStr = txtApellidoMaterno.getText().trim();
-            
+            if(cmbSexo.getSelectedItem().equals("Seleccionar")){
+                JOptionPane.showMessageDialog(this, "Seleccione un sexo.", 
+                        "Error de validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             String sexoStr = (String) cmbSexo.getSelectedItem();
+            if(cmbSexo.getSelectedItem().equals("Seleccionar")){
+                JOptionPane.showMessageDialog(this, "Seleccione un tipo de sangre.", 
+                        "Error de validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             String sangreStr = (String) cmbTipoSangre.getSelectedItem();
 
             if (nombreStr.equals("Ingresa tu nombre") || paternoStr.equals("Ingresa tu apellido paterno")) {

@@ -45,7 +45,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-public class AgregarEstudioFrame extends JFrame {
+public class RegistrarEstudioFrame extends JFrame {
 
     private static final String TEXTO_SELECCION = "Seleccionar tipo de muestra...";
 
@@ -78,7 +78,7 @@ public class AgregarEstudioFrame extends JFrame {
         }
     };
 
-    public AgregarEstudioFrame(UsuarioDTO usuario) {
+    public RegistrarEstudioFrame(UsuarioDTO usuario) {
         this.usuarioActual = usuario;
         this.estudioNegocio = FabricaNegocio.crearEstudioNegocio();
         this.tipoMuestraNegocio = FabricaNegocio.crearTipoMuestraNegocio();
@@ -325,7 +325,7 @@ public class AgregarEstudioFrame extends JFrame {
     // ------------------------------------------------------------------
     private void agregarParametro() {
         // el orden sigue la cantidad de parametros, no de filas (un parametro puede tener varios rangos)
-        new AgregarParametrosFrame(this, parametros.size() + 1, p -> {
+        new RegistrarParametrosFrame(this, parametros.size() + 1, p -> {
             parametros.add(p);
             // una fila por cada rango registrado
             for (CrearRangoDTO r : p.getRangos()) {

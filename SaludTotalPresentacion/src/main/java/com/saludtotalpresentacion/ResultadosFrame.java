@@ -76,7 +76,7 @@ public class ResultadosFrame extends JFrame {
     private final List<ParametroDTO> parametrosSeleccionados = new ArrayList<>();
     private boolean cargando = false;
 
-    private final CampoTexto txtBuscar = new CampoTexto("Buscar folio o paciente...");
+    private final CampoTexto txtBuscar = new CampoTexto("Buscar...");
 
     private final JLabel lblCliente = new JLabel("", SwingConstants.CENTER);
     private final JLabel lblEdad = new JLabel("", SwingConstants.CENTER);
@@ -153,16 +153,14 @@ public class ResultadosFrame extends JFrame {
         panelPrincipal.add(crearTablaParametros());
         panelPrincipal.add(Box.createVerticalGlue());
 
-        BotonClaro btnCancelar = new BotonClaro("Cancelar");
+
         JButton btnGuardar = crearBoton("Guardar Resultado");
-        btnCancelar.addActionListener(e -> limpiar());
         btnGuardar.addActionListener(e -> guardar());
 
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         panelBotones.setBackground(COLOR_FONDO);
         panelBotones.setAlignmentX(Component.LEFT_ALIGNMENT);
         panelBotones.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
-        panelBotones.add(btnCancelar);
         panelBotones.add(btnGuardar);
         panelPrincipal.add(panelBotones);
 
@@ -340,9 +338,10 @@ public class ResultadosFrame extends JFrame {
     private void cargarDatos() {
         try {
             // Solo mostrar solicitudes que NO tengan resultados aún (pendientes)
+            todas.clear();
             List<SolicitudDTO> pendientes = solicitudNegocio.obtenerTodosPendientes();
 
-            todas.clear();
+            
             for (SolicitudDTO sol : pendientes) {
                 // Filtrar canceladas si es necesario (asumimos que obtenerTodosPendientes no trae canceladas)
                 if (sol.getCancelada()) {
@@ -370,7 +369,7 @@ public class ResultadosFrame extends JFrame {
 
     private void buscar() {
         String texto = txtBuscar.getText().trim().toLowerCase();
-        if (texto.equals("buscar folio o paciente...")) {
+        if (texto.equals("buscar...")) {
             texto = "";
         }
 
@@ -409,7 +408,7 @@ public class ResultadosFrame extends JFrame {
             ClienteDTO cli = (ClienteDTO) data[5];
 
             lblCliente.setText(data[2].toString());
-            lblEdad.setText(calcularEdad(cli != null ? cli.getFechaNacimiento() : ""));
+            lblEdad.setText(calcularEdad(cli != null ? cli.getFechaNacimiento() : "") + " años");
             lblDoctor.setText(data[3].toString());
             lblEstudio.setText(data[4].toString());
 
@@ -428,7 +427,7 @@ public class ResultadosFrame extends JFrame {
 
                         if (Boolean.TRUE.equals(p.getNumerico())) {
                             for (RangoDTO r : todosRangosBD) {
-                                if (r.getIdParametro().equals(p.getId())) {
+                                if (r.getIdParametro().equals(p.getId()) && r.getEdadInicio() <= calcularEdad(cli != null ? cli.getFechaNacimiento() : "") && r.getEdadFin() >= calcularEdad(cli != null ? cli.getFechaNacimiento() : "")) {
                                     unidad = p.getUnidadMedida();
                                     rangoStr = r.getInicio() + " - " + r.getFin();
                                     break; // Solo tomamos el primero de forma visual
@@ -462,7 +461,6 @@ public class ResultadosFrame extends JFrame {
     }
 
     private void limpiar() {
-        txtBuscar.setText("Buscar folio o paciente...");
         buscar();
     }
 
@@ -489,9 +487,22 @@ public class ResultadosFrame extends JFrame {
         try {
             for (int i = 0; i < parametrosSeleccionados.size(); i++) {
                 ParametroDTO param = parametrosSeleccionados.get(i);
+                
+                
                 String resStr = String.valueOf(modeloParametros.getValueAt(i, 1)).trim();
+                if(resStr.isBlank() || resStr.equalsIgnoreCase("Ingrese el resultado")){
+                    JOptionPane.showMessageDialog(this, "ingrese un resultado.",
+                            "Error de validación", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
                 String obsStr = String.valueOf(modeloParametros.getValueAt(i, 4)).trim();
-
+                if(resStr.isBlank() || resStr.equalsIgnoreCase("Ingrese la Observacion")){
+                    JOptionPane.showMessageDialog(this, "ingrese una observacion.",
+                            "Error de validación", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
                 CrearResultadoDTO dto = new CrearResultadoDTO(resStr, obsStr, solicitudSeleccionada.getId(), param.getId());
                 resultadoNegocio.registrar(dto);
             }
@@ -499,6 +510,7 @@ public class ResultadosFrame extends JFrame {
 
             // Actualizamos la lista, la base de datos y limpiamos la pantalla
             limpiar();
+            todas.clear();
             cargarDatos();
 
         } catch (NegocioException ex) {
@@ -510,15 +522,15 @@ public class ResultadosFrame extends JFrame {
     // ------------------------------------------------------------------
     // Utilidades
     // ------------------------------------------------------------------
-    private String calcularEdad(String fechaNacimiento) {
+    private Integer calcularEdad(String fechaNacimiento) {
         if (fechaNacimiento == null || fechaNacimiento.isBlank()) {
-            return "N/A";
+            return null;
         }
         try {
             LocalDate nacimiento = LocalDate.parse(fechaNacimiento);
-            return Period.between(nacimiento, LocalDate.now()).getYears() + " años";
+            return Period.between(nacimiento, LocalDate.now()).getYears();
         } catch (Exception e) {
-            return fechaNacimiento;
+            return null;
         }
     }
 

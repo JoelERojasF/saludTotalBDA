@@ -15,19 +15,15 @@ public class ParametroDTO {
     private String descripcion;
     private Integer ordenAparicion;
     private String unidadMedida;
-    private String valorInicial;
-    private String valorFinal;
     private Boolean numerico;
     private Integer idEstudio;
 
-    public ParametroDTO(Integer id, String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, String valorInicial, String valorFinal, Boolean numerico, Integer idEstudio) {
+    public ParametroDTO(Integer id, String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, Boolean numerico, Integer idEstudio) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ordenAparicion = ordenAparicion;
         this.unidadMedida = unidadMedida;
-        this.valorInicial = valorInicial;
-        this.valorFinal = valorFinal;
         this.numerico = numerico;
         this.idEstudio = idEstudio;
     }
@@ -72,22 +68,6 @@ public class ParametroDTO {
         this.unidadMedida = unidadMedida;
     }
 
-    public String getValorInicial() {
-        return valorInicial;
-    }
-
-    public void setValorInicial(String valorInicial) {
-        this.valorInicial = valorInicial;
-    }
-
-    public String getValorFinal() {
-        return valorFinal;
-    }
-
-    public void setValorFinal(String valorFinal) {
-        this.valorFinal = valorFinal;
-    }
-
     public Boolean getNumerico() {
         return numerico;
     }
@@ -106,7 +86,7 @@ public class ParametroDTO {
 
     @Override
     public String toString() {
-        return "ParametroDTO{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + ", idEstudio=" + idEstudio + '}';
+        return "ParametroDTO{" + "id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", numerico=" + numerico + ", idEstudio=" + idEstudio + '}';
     }
     
 }

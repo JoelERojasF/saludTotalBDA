@@ -17,20 +17,16 @@ public class CrearParametroDTO {
     private String descripcion;
     private Integer ordenAparicion;
     private String unidadMedida;
-    private String valorInicial;
-    private String valorFinal;
     private Boolean numerico;
     private Integer idEstudio;
 
     private List<CrearRangoDTO> rangos = new ArrayList<>();
 
-    public CrearParametroDTO(String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, String valorInicial, String valorFinal, Boolean numerico, Integer idEstudio) {
+    public CrearParametroDTO(String nombre, String descripcion, Integer ordenAparicion, String unidadMedida, Boolean numerico, Integer idEstudio) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.ordenAparicion = ordenAparicion;
         this.unidadMedida = unidadMedida;
-        this.valorInicial = valorInicial;
-        this.valorFinal = valorFinal;
         this.numerico = numerico;
         this.idEstudio = idEstudio;
     }
@@ -67,22 +63,6 @@ public class CrearParametroDTO {
         this.unidadMedida = unidadMedida;
     }
 
-    public String getValorInicial() {
-        return valorInicial;
-    }
-
-    public void setValorInicial(String valorInicial) {
-        this.valorInicial = valorInicial;
-    }
-
-    public String getValorFinal() {
-        return valorFinal;
-    }
-
-    public void setValorFinal(String valorFinal) {
-        this.valorFinal = valorFinal;
-    }
-
     public Boolean getNumerico() {
         return numerico;
     }
@@ -109,7 +89,7 @@ public class CrearParametroDTO {
 
     @Override
     public String toString() {
-        return "CrearParametroDTO{" + "nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", valorInicial=" + valorInicial + ", valorFinal=" + valorFinal + ", numerico=" + numerico + '}';
+        return "CrearParametroDTO{" + "nombre=" + nombre + ", descripcion=" + descripcion + ", ordenAparicion=" + ordenAparicion + ", unidadMedida=" + unidadMedida + ", numerico=" + numerico + '}';
     }
     
 }

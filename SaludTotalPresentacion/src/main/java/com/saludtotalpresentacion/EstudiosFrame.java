@@ -120,7 +120,7 @@ public class EstudiosFrame extends JFrame {
         panelPrincipal.add(crearFilaDerecha(btnEditar));
 
         btnAgregar.addActionListener(e -> {
-            new AgregarEstudioFrame(usuarioActual).setVisible(true);
+            new RegistrarEstudioFrame(usuarioActual).setVisible(true);
             dispose();
         });
         btnEditar.addActionListener(e -> editarSeleccionado());
