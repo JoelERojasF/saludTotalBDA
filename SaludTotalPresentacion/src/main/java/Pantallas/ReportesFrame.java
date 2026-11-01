@@ -74,6 +74,8 @@ public class ReportesFrame extends JFrame {
 
         panelPrincipal.add(crearFilaBusqueda());
         panelPrincipal.add(Box.createVerticalStrut(20));
+        
+        panelPrincipal.add(crearEncabezado()); 
 
         panelLista.setLayout(new BoxLayout(panelLista, BoxLayout.Y_AXIS));
         panelLista.setBackground(COLOR_FONDO);
@@ -261,6 +263,27 @@ public class ReportesFrame extends JFrame {
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boton.setPreferredSize(new Dimension(140, 40));
         return boton;
+    }
+    
+    private JPanel crearEncabezado() {
+        JPanel fila = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
+        fila.setBackground(COLOR_FONDO);
+        fila.setAlignmentX(Component.LEFT_ALIGNMENT);
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+
+        fila.add(crearTitulo("Folio", 70));
+        fila.add(crearTitulo("Nombre", 160));
+        fila.add(crearTitulo("Fecha", 180));
+        fila.add(crearTitulo("Estudio", 150));
+        return fila;
+    }
+
+    private JLabel crearTitulo(String texto, int ancho) {
+        JLabel lbl = new JLabel(texto);
+        lbl.setFont(new Font(FUENTE, Font.BOLD, 14));
+        lbl.setForeground(COLOR_TEXTO);
+        lbl.setPreferredSize(new Dimension(ancho, 30));
+        return lbl;
     }
 
 }

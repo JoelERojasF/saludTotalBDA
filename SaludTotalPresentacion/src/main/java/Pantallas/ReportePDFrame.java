@@ -3,6 +3,7 @@ package Pantallas;
 import DTO.ClienteDTO;
 import DTO.DoctorDTO;
 import DTO.EmpresaDTO;
+import DTO.EstudioDTO;
 import DTO.ParametroDTO;
 import DTO.RangoDTO;
 import DTO.ResultadoDTO;
@@ -44,8 +45,10 @@ import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 import java.awt.Desktop;
 import java.nio.file.Files;
+import javax.swing.JTextField;
 
 public class ReportePDFrame extends JFrame {
+    
 
     JLabel lblPaciente = new JLabel();
     JLabel lblEdad = new JLabel();
@@ -54,15 +57,18 @@ public class ReportePDFrame extends JFrame {
     JLabel lblFolio = new JLabel();
     JLabel lblFecha = new JLabel();
     JLabel lblDoctor = new JLabel();
-    JLabel lblEstudio = new JLabel("", SwingConstants.CENTER);
+    JTextField lblEstudio = new JTextField();
 
     JLabel lblDireccion = new JLabel("", SwingConstants.CENTER);
     JLabel lblTelefono = new JLabel("", SwingConstants.CENTER);
     JLabel lblCorreo = new JLabel("", SwingConstants.CENTER);
     JLabel lblRfc = new JLabel("", SwingConstants.CENTER);
     JLabel lblCedula = new JLabel("", SwingConstants.CENTER);
+    
+    
 
     private UsuarioDTO usuarioActual;
+    private Integer idEstudio;
 
     DefaultTableModel modelo = new DefaultTableModel(
             new Object[]{"Determinacion", "Resultados", "Unidad", "Valores normales", "Observaciones"}, 0) {
@@ -118,6 +124,7 @@ public class ReportePDFrame extends JFrame {
         datos.add(new JLabel());
 
         lblEstudio.setFont(titulo);
+        lblEstudio.setHorizontalAlignment(SwingConstants.CENTER);
         JPanel abajo = new JPanel(new BorderLayout(0, 10));
         abajo.add(lblEstudio, BorderLayout.NORTH);
         abajo.add(new JScrollPane(new JTable(modelo)), BorderLayout.CENTER);
@@ -136,9 +143,13 @@ public class ReportePDFrame extends JFrame {
         });
         JButton btnPdf = new JButton("Generar PDF");
         btnPdf.addActionListener(e -> generarPdf());
+        
+        JButton btnGuardar = new JButton("Guardar nombre");
+        btnGuardar.addActionListener(e -> guardarNombreEstudio());
 
         JPanel panelBoton = new JPanel();
         panelBoton.add(btnRegresar);
+        panelBoton.add(btnGuardar);
         panelBoton.add(btnPdf);
 
         lblRfc.setFont(datoEmpresa);
@@ -201,7 +212,8 @@ public class ReportePDFrame extends JFrame {
             }
 
             lblEstudio.setText(FabricaNegocio.crearEstudioNegocio().buscarPorId(s.getIdEstudio()).getNombre());
-
+            idEstudio = s.getIdEstudio();
+            
             List<ResultadoDTO> resultados = new ResultadoNegocio().obtenerTodos();
             List<RangoDTO> rangos = new RangoNegocio().obtenerTodos();
 
@@ -307,4 +319,14 @@ public class ReportePDFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Error al generar el PDF: " + ex.getMessage());
         }
     }
+    private void guardarNombreEstudio() {
+    try {
+        EstudioDTO estudio = FabricaNegocio.crearEstudioNegocio().buscarPorId(idEstudio);
+        estudio.setNombre(lblEstudio.getText());
+        FabricaNegocio.crearEstudioNegocio().actualizar(estudio);
+        JOptionPane.showMessageDialog(this, "Nombre del estudio guardado.");
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "No se pudo guardar: " + ex.getMessage());
+    }
+}
 }
