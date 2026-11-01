@@ -143,6 +143,7 @@ public class ReportePDFrame extends JFrame {
         });
         JButton btnPdf = new JButton("Generar PDF");
         btnPdf.addActionListener(e -> generarPdf());
+        btnPdf.setEnabled(!estaRechazada());
         
         JButton btnGuardar = new JButton("Guardar nombre");
         btnGuardar.addActionListener(e -> guardarNombreEstudio());
@@ -320,13 +321,22 @@ public class ReportePDFrame extends JFrame {
         }
     }
     private void guardarNombreEstudio() {
-    try {
-        EstudioDTO estudio = FabricaNegocio.crearEstudioNegocio().buscarPorId(idEstudio);
-        estudio.setNombre(lblEstudio.getText());
-        FabricaNegocio.crearEstudioNegocio().actualizar(estudio);
-        JOptionPane.showMessageDialog(this, "Nombre del estudio guardado.");
-    } catch (Exception ex) {
-        JOptionPane.showMessageDialog(this, "No se pudo guardar: " + ex.getMessage());
+        try {
+            EstudioDTO estudio = FabricaNegocio.crearEstudioNegocio().buscarPorId(idEstudio);
+            estudio.setNombre(lblEstudio.getText());
+            FabricaNegocio.crearEstudioNegocio().actualizar(estudio);
+            JOptionPane.showMessageDialog(this, "Nombre del estudio guardado.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "No se pudo guardar: " + ex.getMessage());
+        } 
+    }   
+    private boolean estaRechazada() {
+        for (int f = 0; f < modelo.getRowCount(); f++) {
+            String obs = String.valueOf(modelo.getValueAt(f, 4)).trim();
+            if (obs.equalsIgnoreCase("Rechazada")) {
+                return true;
+            }
+        }
+        return false;
     }
-}
 }
